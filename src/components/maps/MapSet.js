@@ -62,4 +62,6 @@ const mapDispatchToPropsFactory = () => {
 	};
 };
 
-export default connect(mapStateToProps, mapDispatchToPropsFactory);
+export default connect(mapStateToProps, mapDispatchToPropsFactory, null, {
+	forwardRef: true,
+});
