@@ -931,12 +931,9 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 
 		let options = {...dataSourceOptions, ...layerStateOptions};
 
-		let validType = false;
 		if (type === 'wmts') {
-			validType = true;
 			options.url = dataSourceOptions.url || dataSourceOptions.urls?.[0];
 		} else if (type === 'cogBitmap') {
-			validType = true;
 			options.url = dataSourceOptions.url;
 
 			let style = selectorHelpers.getDefaultCogStyle();
@@ -945,7 +942,6 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 			}
 			options.style = style;
 		} else if (type === 'mvt') {
-			validType = true;
 			let selected = null;
 			let style = options?.style;
 
@@ -968,7 +964,6 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 				geometryColumnName,
 			};
 		} else if (type === 'wms') {
-			validType = true;
 			let {url, params, configuration, ...rest} = dataSourceOptions;
 			const singleTile =
 				configuration && Object.hasOwn(configuration, 'singleTile')
@@ -1022,7 +1017,6 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 			type === 'tiledVector' ||
 			type === 'tiled-vector'
 		) {
-			validType = true;
 			let features,
 				tiles = null;
 
@@ -1092,18 +1086,14 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 			};
 		}
 
-		if (validType) {
-			return {
-				key: layerKey + '_' + spatialDataSource.key,
-				layerKey,
-				opacity: opacity || opacity === 0 ? opacity : 1,
-				name,
-				type,
-				options,
-			};
-		} else {
-			return null;
-		}
+		return {
+			key: layerKey + '_' + spatialDataSource.key,
+			layerKey,
+			opacity: opacity || opacity === 0 ? opacity : 1,
+			name,
+			type,
+			options,
+		};
 	},
 	recomputeSelectorOptions
 );
