@@ -35,7 +35,7 @@ const getAllMapsInUse = state => state.maps.inUse.maps;
 const getActiveMapKey = state => state.maps.activeMapKey;
 const getActiveSetKey = state => state.maps.activeSetKey;
 const getMapsAsObject = state => state.maps.maps;
-const getMapSetsAsObject = state => state.maps.sets;
+const getMapSetsAsObject = state => state?.maps?.sets;
 
 const getActiveMap = createSelector(
 	[getMapsAsObject, getActiveMapKey],
