@@ -618,10 +618,10 @@ const setSetBackgroundLayer = (state, setKey, backgroundLayer) => {
 };
 
 /**
- * Set map set background layer state
+ * Set map set active 3D property
  * @param state {Object}
  * @param setKey {string}
- * @param backgroundLayer {Object} background layer state
+ * @param active3D {boolean}
  * @return {Object} state
  */
 const setSetActive3D = (state, setKey, active3D) => {
