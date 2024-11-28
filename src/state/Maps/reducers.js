@@ -617,6 +617,37 @@ const setSetBackgroundLayer = (state, setKey, backgroundLayer) => {
 	}
 };
 
+/**
+ * Set map set background layer state
+ * @param state {Object}
+ * @param setKey {string}
+ * @param backgroundLayer {Object} background layer state
+ * @return {Object} state
+ */
+const setSetActive3D = (state, setKey, active3D) => {
+	if (
+		setKey &&
+		state.sets?.[setKey] &&
+		(active3D === true || active3D === false)
+	) {
+		return {
+			...state,
+			sets: {
+				...state.sets,
+				[setKey]: {
+					...state.sets[setKey],
+					data: {
+						...state.sets[setKey].data,
+						active3D,
+					},
+				},
+			},
+		};
+	} else {
+		return state;
+	}
+};
+
 const setMapSetSync = (state, mapSetKey, sync) => {
 	if (mapSetKey && state.sets?.[mapSetKey]) {
 		return {
@@ -655,6 +686,39 @@ const setMapBackgroundLayer = (state, mapKey, backgroundLayer) => {
 								backgroundLayer,
 						  }
 						: {backgroundLayer},
+				},
+			},
+		};
+	} else {
+		return state;
+	}
+};
+
+/**
+ * Set map active 3D state
+ * @param state {Object}
+ * @param mapKey {string}
+ * @param active3D {boolean}
+ * @return {Object} state
+ */
+const setActive3D = (state, mapKey, active3D) => {
+	if (
+		mapKey &&
+		state.maps?.[mapKey] &&
+		(active3D === true || active3D === false)
+	) {
+		return {
+			...state,
+			maps: {
+				...state.maps,
+				[mapKey]: {
+					...state.maps[mapKey],
+					data: state.maps[mapKey].data
+						? {
+								...state.maps[mapKey].data,
+								active3D,
+						  }
+						: {active3D},
 				},
 			},
 		};
@@ -948,6 +1012,8 @@ export default function tasksReducer(state = INITIAL_STATE, action) {
 				action.mapKey,
 				action.backgroundLayer
 			);
+		case ActionTypes.MAPS.MAP.SET_ACTIVE3D:
+			return setActive3D(state, action.mapKey, action.active3D);
 		case ActionTypes.MAPS.SET.ADD:
 			return addMapSet(state, action.mapSet);
 		case ActionTypes.MAPS.SET.ADD_MAP:
@@ -964,6 +1030,8 @@ export default function tasksReducer(state = INITIAL_STATE, action) {
 				action.setKey,
 				action.backgroundLayer
 			);
+		case ActionTypes.MAPS.SET.SET_ACTIVE3D:
+			return setSetActive3D(state, action.mapSetKey, action.active3D);
 		case ActionTypes.MAPS.SET.SET_SYNC:
 			return setMapSetSync(state, action.mapSetKey, action.sync);
 		case ActionTypes.MAPS.SET.LAYERS.SET:
