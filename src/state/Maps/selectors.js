@@ -367,7 +367,7 @@ const getMapSetBackgroundLayerStateByMapKey = createSelector(
 );
 
 /**
- * It find mapSet wher mapKey belongs and return mapSet background layer definition.
+ * Get active3D property value which belongs to given mapSetKey
  * @param state {Object}
  * @param mapKey {string}
  */
