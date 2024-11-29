@@ -1142,7 +1142,7 @@ const actionSetMapBackgroundLayer = (mapKey, backgroundLayer) => {
 
 const actionSetMapActive3D = (mapKey, active3D) => {
 	return {
-		type: ActionTypes.MAPS.MAP.SET_ACTIVE3D,
+		type: ActionTypes.MAPS.MAP.SET_ACTIVE_3D,
 		mapKey,
 		active3D,
 	};
@@ -1150,7 +1150,7 @@ const actionSetMapActive3D = (mapKey, active3D) => {
 
 const actionSetMapSetActive3D = (mapSetKey, active3D) => {
 	return {
-		type: ActionTypes.MAPS.SET.SET_ACTIVE3D,
+		type: ActionTypes.MAPS.SET.SET_ACTIVE_3D,
 		mapSetKey,
 		active3D,
 	};

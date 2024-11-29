@@ -1012,7 +1012,7 @@ export default function tasksReducer(state = INITIAL_STATE, action) {
 				action.mapKey,
 				action.backgroundLayer
 			);
-		case ActionTypes.MAPS.MAP.SET_ACTIVE3D:
+		case ActionTypes.MAPS.MAP.SET_ACTIVE_3D:
 			return setActive3D(state, action.mapKey, action.active3D);
 		case ActionTypes.MAPS.SET.ADD:
 			return addMapSet(state, action.mapSet);
@@ -1030,7 +1030,7 @@ export default function tasksReducer(state = INITIAL_STATE, action) {
 				action.setKey,
 				action.backgroundLayer
 			);
-		case ActionTypes.MAPS.SET.SET_ACTIVE3D:
+		case ActionTypes.MAPS.SET.SET_ACTIVE_3D:
 			return setSetActive3D(state, action.mapSetKey, action.active3D);
 		case ActionTypes.MAPS.SET.SET_SYNC:
 			return setMapSetSync(state, action.mapSetKey, action.sync);
