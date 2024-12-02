@@ -763,6 +763,41 @@ function setMapSetBackgroundLayer(setKey, backgroundLayer) {
 }
 
 /**
+ * Set active 3D for given mapSetKey
+ * @param {string} setKey
+ * @param {boolean} active3D
+ * @returns
+ */
+function setMapSetActive3D(setKey, active3D) {
+	return (dispatch, getState) => {
+		const mapSet = Select.maps.getMapSetByKey(getState(), setKey);
+		const active3DValid = active3D === true || active3D === false;
+		if (mapSet && active3DValid) {
+			dispatch(actionSetMapSetActive3D(setKey, active3D));
+		} else {
+			console.warn('No mapSet found for set key or active3D invalid.');
+		}
+	};
+}
+
+/**
+ * Set active 3D for given mapKey
+ * @param {string} mapKey
+ * @param {boolean} active3D
+ * @returns
+ */
+function setMapActive3D(mapKey, active3D) {
+	return (dispatch, getState) => {
+		const map = Select.maps.getMapByKey(getState(), mapKey);
+		const active3DValid = active3D === true || active3D === false;
+		if (map && active3DValid) {
+			dispatch(actionSetMapActive3D(mapKey, active3D));
+		} else {
+			console.warn('No map found for key or active3D invalid.');
+		}
+	};
+}
+/**
  * Set background layer for map.
  * @param mapKey {string}
  * @param backgroundLayer {Object} background layer definition
@@ -1105,6 +1140,22 @@ const actionSetMapBackgroundLayer = (mapKey, backgroundLayer) => {
 	};
 };
 
+const actionSetMapActive3D = (mapKey, active3D) => {
+	return {
+		type: ActionTypes.MAPS.MAP.SET_ACTIVE_3D,
+		mapKey,
+		active3D,
+	};
+};
+
+const actionSetMapSetActive3D = (mapSetKey, active3D) => {
+	return {
+		type: ActionTypes.MAPS.SET.SET_ACTIVE_3D,
+		mapSetKey,
+		active3D,
+	};
+};
+
 const actionSetMapSetLayers = (setKey, layers) => {
 	return {
 		type: ActionTypes.MAPS.SET.LAYERS.SET,
@@ -1219,6 +1270,8 @@ export default {
 	setMapSetActiveMapKey,
 	setMapBackgroundLayer,
 	setMapSetBackgroundLayer,
+	setMapActive3D,
+	setMapSetActive3D,
 	setMapSetLayers,
 	setMapSetSync,
 	setMapViewport,

@@ -269,6 +269,14 @@ const getMapSetMapKeys = createSelector([getMapSetByKey], set => {
  * @param state {Object}
  * @param setKey {string}
  */
+const getMapSetActive3DByKey = createSelector([getMapSetByKey], set => {
+	return set?.data?.active3D === true;
+});
+
+/**
+ * @param state {Object}
+ * @param setKey {string}
+ */
 const getMapSetMaps = createSelector(
 	[getMapsAsObject, getMapSetMapKeys],
 	(maps, mapKeys) => {
@@ -318,6 +326,14 @@ const getMapBackgroundLayerStateByMapKey = createSelector(
  * @param state {Object}
  * @param mapKey {string}
  */
+const getMapActive3DByMapKey = createSelector([getMapByKey], map => {
+	return map?.data?.active3D === true;
+});
+
+/**
+ * @param state {Object}
+ * @param mapKey {string}
+ */
 const getMapLayersStateByMapKey = createSelector([getMapByKey], map => {
 	return map?.data?.layers || null;
 });
@@ -349,6 +365,15 @@ const getMapSetBackgroundLayerStateByMapKey = createSelector(
 		return set?.data?.backgroundLayer || null;
 	}
 );
+
+/**
+ * Get active3D property value which belongs to given mapSetKey
+ * @param state {Object}
+ * @param mapKey {string}
+ */
+const getMapSetActive3DByMapKey = createSelector([getMapSetByMapKey], set => {
+	return set?.data?.active3D === true;
+});
 
 /**
  * It find mapSet wher mapKey belongs and return mapSet layers definition.
@@ -1087,7 +1112,7 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 		}
 
 		return {
-			key: layerKey + '_' + spatialDataSource.key,
+			key: layerKey + '_' + spatialDataSource?.key,
 			layerKey,
 			opacity: opacity || opacity === 0 ? opacity : 1,
 			name,
@@ -1267,6 +1292,7 @@ export default {
 
 	getMapBackgroundLayerStateByMapKey,
 	getMapBackgroundLayer,
+	getMapActive3DByMapKey,
 	getMapByKey,
 	getMapFilterByActiveByMapKey,
 	getMapLayerStateByMapKeyAndLayerKey,
@@ -1280,6 +1306,8 @@ export default {
 	getMapSetActiveMapView,
 	getMapSetActiveMapViewport,
 	getMapSetActiveMapLayers,
+	getMapSetActive3DByMapKey,
+	getMapSetActive3DByKey,
 	getMapSetBackgroundLayerStateByMapKey,
 	getMapSetByMapKey,
 	getMapSetByKey,

@@ -397,6 +397,7 @@ export default utils.deepKeyMirror({
 			},
 			REMOVE: null,
 			REMOVE_MAP: null,
+			SET_ACTIVE_3D: null,
 			SET_ACTIVE_MAP_KEY: null,
 			SET_BACKGROUND_LAYER: null,
 			SET_SYNC: null,
@@ -426,6 +427,7 @@ export default utils.deepKeyMirror({
 				SET_STYLE_KEY: null,
 			},
 			REMOVE: null,
+			SET_ACTIVE_3D: null,
 			SET_BACKGROUND_LAYER: null,
 			USE: {
 				CLEAR: null,
