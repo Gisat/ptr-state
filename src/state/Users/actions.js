@@ -125,9 +125,7 @@ function apiLoginUser(email, password, cookies = false) {
 			username: email,
 			password: password,
 			cookies,
-			development:
-				process.env.NODE_ENV === 'development' ||
-				import.meta.env.NODE_ENV === 'development', //if true, BE will set proper cookies even for development localhost
+			development: process.env.NODE_ENV === 'development', //if true, BE will set proper cookies even for development localhost
 		};
 
 		return request(localConfig, 'api/login/login', 'POST', null, payload)
@@ -228,9 +226,7 @@ function apiLogoutUser(ttl = TTL) {
 		const localConfig = Select.app.getCompleteLocalConfiguration(getState());
 
 		let payload = {
-			development:
-				process.env.NODE_ENV === 'development' ||
-				import.meta.env.NODE_ENV === 'development',
+			development: process.env.NODE_ENV === 'development',
 		};
 
 		return request(

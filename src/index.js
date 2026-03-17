@@ -161,10 +161,7 @@ const createBaseStore = (
 	const enhancedThunk = thunk.withExtraArgument(activeMetadataActions);
 
 	let appliedMiddleware = applyMiddleware(enhancedThunk, ...middleware);
-	if (
-		process.env.NODE_ENV === 'development' ||
-		import.meta.env.NODE_ENV === 'development'
-	) {
+	if (process.env.NODE_ENV === 'development') {
 		appliedMiddleware = applyMiddleware(enhancedThunk, logger, ...middleware);
 	}
 	let stores = specificStores

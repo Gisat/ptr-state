@@ -1236,6 +1236,22 @@ const getMapLayers = createRecomputeSelector((mapKey, layersState) => {
 					);
 				if (spatialDataSources) {
 					_forEach(spatialDataSources, dataSource => {
+						const dataSourceType = dataSource?.data?.type;
+
+						// Skip data sources with unsupported types
+						const supportedTypes = [
+							'wmts',
+							'wms',
+							'vector',
+							'tiledVector',
+							'tiled-vector',
+							'mvt',
+							'cogBitmap',
+						];
+						if (!supportedTypes.includes(dataSourceType)) {
+							return;
+						}
+
 						finalLayers.push(
 							getFinalLayerByDataSourceAndLayerState(
 								dataSource,
@@ -1253,7 +1269,7 @@ const getMapLayers = createRecomputeSelector((mapKey, layersState) => {
 			}
 		});
 
-		return finalLayers.length ? finalLayers : null;
+		return finalLayers.length ? finalLayers : [null];
 	} else {
 		return null;
 	}
