@@ -29,7 +29,8 @@
 				[
 					"@babel/preset-env",
 					{
-						"modules": "auto"
+						"modules": "commonjs",
+						"bugfixes": true
 					}
 				],
 				["@babel/preset-react", {"runtime": "automatic"}]
@@ -40,8 +41,7 @@
 					{
 						"useESModules": false
 					}
-				],
-				"istanbul"
+				]
 			]
 		}
 	}
