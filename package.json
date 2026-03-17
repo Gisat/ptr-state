@@ -83,6 +83,15 @@
 		"rollup-plugin-filesize": "^9.1.0",
 		"slash": "3.0.0"
 	},
+	"release": {
+		"branches": [
+			"master",
+			{
+				"name": "dev",
+				"prerelease": true
+			}
+		]
+	},
 	"scripts": {
 		"clean": "rimraf dist",
 		"start": "cross-env BABEL_ENV=development run-s clean && run-p start:es start:cjs start:lib:es",
