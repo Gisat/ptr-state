@@ -7,7 +7,7 @@
 		"panther",
 		"gisat"
 	],
-	"homepage": "https://github.com/gisat-panther/ptr-state",
+	"homepage": "https://github.com/Gisat/ptr-state",
 	"prettier": "@gisatcz/prettier-config",
 	"husky": {
 		"hooks": {
@@ -23,7 +23,7 @@
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/gisat-panther/ptr-state"
+		"url": "https://github.com/Gisat/ptr-state"
 	},
 	"peerDependencies": {
 		"react": "^16.13.1 || ^17.0.2 || ^18.1.0 ",
