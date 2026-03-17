@@ -2,23 +2,29 @@ import ActionTypes from '../../constants/ActionTypes';
 import common from '../_common/actions';
 import Select from '../Select';
 
+export const dataType = 'periods';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 
 const add = common.add(ActionTypes.PERIODS);
 const create = common.create(
 	Select.periods.getSubstate,
-	'periods',
-	ActionTypes.PERIODS
+	dataType,
+	ActionTypes.PERIODS,
+	beCategoryPath
 );
 const deleteItem = common.delete(
 	Select.periods.getSubstate,
-	'periods',
-	ActionTypes.PERIODS
+	dataType,
+	ActionTypes.PERIODS,
+	beCategoryPath
 );
 const saveEdited = common.saveEdited(
 	Select.periods.getSubstate,
-	'periods',
-	ActionTypes.PERIODS
+	dataType,
+	ActionTypes.PERIODS,
+	beCategoryPath
 );
 const setActiveKey = common.setActiveKey(ActionTypes.PERIODS);
 const setActiveKeys = common.setActiveKeys(ActionTypes.PERIODS);
@@ -29,21 +35,24 @@ const updateEdited = common.updateEdited(
 const updateStateFromView = common.updateSubstateFromView(ActionTypes.PERIODS);
 const useKeys = common.useKeys(
 	Select.periods.getSubstate,
-	'periods',
-	ActionTypes.PERIODS
+	dataType,
+	ActionTypes.PERIODS,
+	beCategoryPath
 );
 const useKeysClear = common.useKeysClear(ActionTypes.PERIODS);
 const useIndexed = common.useIndexed(
 	Select.periods.getSubstate,
-	'periods',
-	ActionTypes.PERIODS
+	dataType,
+	ActionTypes.PERIODS,
+	beCategoryPath
 );
 const useIndexedClear = common.useIndexedClear(ActionTypes.PERIODS);
 const clearIndex = common.clearIndex(ActionTypes.PERIODS);
 const refreshUses = common.refreshUses(
 	Select.periods.getSubstate,
-	`periods`,
-	ActionTypes.PERIODS
+	dataType,
+	ActionTypes.PERIODS,
+	beCategoryPath
 );
 const setActiveKeyAndEnsureDependencies = key => {
 	return (dispatch, getState, options) => {

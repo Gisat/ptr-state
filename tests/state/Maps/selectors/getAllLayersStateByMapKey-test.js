@@ -1,5 +1,6 @@
 import Select from '../../../../src/state/Select';
 import {assert} from 'chai';
+import {setState} from '@jvitela/recompute';
 import testHelpers from '../../../helpers';
 import {MapsSelectorsState as state} from './_state';
 
@@ -14,7 +15,6 @@ describe('getAllLayersStateByMapKey', function () {
 			layerTemplateKey: 'layerTemplate2',
 			metadataModifiers: {
 				periodKey: 'period1',
-				scopeKey: 'scope1',
 			},
 			filterByActive: null,
 		},
@@ -25,15 +25,10 @@ describe('getAllLayersStateByMapKey', function () {
 			styleKey: 'style1',
 			metadataModifiers: {
 				placeKey: 'place1',
-				scopeKey: 'scope1',
+
 				scenarioKeys: ['scenario1', 'scenario2'],
 			},
-			filterByActive: {
-				place: true,
-				period: true,
-				layerTemplateKey: true,
-				applicationKey: true,
-			},
+			filterByActive: null,
 		},
 		{
 			key: 'layerDefinition1',
@@ -49,18 +44,16 @@ describe('getAllLayersStateByMapKey', function () {
 					],
 				},
 			},
-			filterByActive: {
-				period: true,
-			},
-			metadataModifiers: {
-				scopeKey: 'scope1',
-			},
+			filterByActive: null,
+			metadataModifiers: null,
 		},
 	];
 
 	it('should return all map layers for map 1', () => {
+		setState(state);
 		const output = Select.maps.getAllLayersStateByMapKey(state, 'map1');
 		assert.deepStrictEqual(output, expectedResult);
+		setState(null);
 	});
 
 	testHelpers.testCache(
@@ -70,6 +63,7 @@ describe('getAllLayersStateByMapKey', function () {
 	);
 
 	it('should return all map layers for map 2', () => {
+		setState(state);
 		const expectedResult = [
 			{
 				key: 'pantherBackgroundLayer',
@@ -83,7 +77,6 @@ describe('getAllLayersStateByMapKey', function () {
 				layerTemplateKey: 'layerTemplate2',
 				metadataModifiers: {
 					periodKey: 'period1',
-					scopeKey: 'scope1',
 				},
 				filterByActive: null,
 			},
@@ -94,17 +87,17 @@ describe('getAllLayersStateByMapKey', function () {
 				styleKey: 'style3',
 				metadataModifiers: {
 					placeKey: 'place2',
-					periodKey: 'period2',
-					scopeKey: 'scope1',
 				},
 				filterByActive: null,
 			},
 		];
 		const output = Select.maps.getAllLayersStateByMapKey(state, 'map2');
 		assert.deepStrictEqual(output, expectedResult);
+		setState(null);
 	});
 
 	it('should return null, if both backgroundLayer and layers is null', () => {
+		setState(state);
 		const updatedState = {
 			...state,
 			maps: {
@@ -135,5 +128,6 @@ describe('getAllLayersStateByMapKey', function () {
 		};
 		const output = Select.maps.getAllLayersStateByMapKey(updatedState, 'map1');
 		assert.isNull(output);
+		setState(null);
 	});
 });

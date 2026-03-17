@@ -160,7 +160,7 @@ describe('state/Data/Components/actions/ensureWithFilterByActive', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 			if (

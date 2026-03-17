@@ -10,7 +10,6 @@ describe('getLayersStateByMapKeyObserver', function () {
 			layerTemplateKey: 'layerTemplate2',
 			metadataModifiers: {
 				periodKey: 'period1',
-				scopeKey: 'scope1',
 			},
 			filterByActive: null,
 		},
@@ -21,15 +20,9 @@ describe('getLayersStateByMapKeyObserver', function () {
 			styleKey: 'style1',
 			metadataModifiers: {
 				placeKey: 'place1',
-				scopeKey: 'scope1',
 				scenarioKeys: ['scenario1', 'scenario2'],
 			},
-			filterByActive: {
-				place: true,
-				period: true,
-				layerTemplateKey: true,
-				applicationKey: true,
-			},
+			filterByActive: null,
 		},
 		{
 			key: 'layerDefinition1',
@@ -45,12 +38,8 @@ describe('getLayersStateByMapKeyObserver', function () {
 					],
 				},
 			},
-			filterByActive: {
-				period: true,
-			},
-			metadataModifiers: {
-				scopeKey: 'scope1',
-			},
+			filterByActive: null,
+			metadataModifiers: null,
 		},
 	];
 
@@ -60,7 +49,6 @@ describe('getLayersStateByMapKeyObserver', function () {
 			layerTemplateKey: 'layerTemplate2',
 			metadataModifiers: {
 				periodKey: 'period1',
-				scopeKey: 'scope1',
 			},
 			filterByActive: null,
 		},
@@ -71,8 +59,6 @@ describe('getLayersStateByMapKeyObserver', function () {
 			styleKey: 'style3',
 			metadataModifiers: {
 				placeKey: 'place2',
-				periodKey: 'period2',
-				scopeKey: 'scope1',
 			},
 			filterByActive: null,
 		},

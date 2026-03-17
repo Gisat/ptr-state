@@ -2,17 +2,32 @@ import ActionTypes from '../../../constants/ActionTypes';
 import common from '../../_common/actions';
 import Select from '../../Select';
 
+export const dataType = 'datasource';
+export const beCategoryPath = 'be-metadata';
+
 const actionTypes = ActionTypes.DATA.SPATIAL_DATA_SOURCES;
 
 const addIndex = common.addIndex(actionTypes);
 const add = common.add(actionTypes);
 const useKeys = common.useKeys(
 	Select.data.spatialDataSources.getSubstate,
-	'spatial',
+	dataType,
 	actionTypes,
-	'dataSources'
+	beCategoryPath
 );
 
+const ensureIndexed = (filter, order, start, length) => {
+	return common.ensureIndexed(
+		Select.data.spatialDataSources.getSubstate,
+		dataType,
+		filter,
+		order,
+		start,
+		length,
+		ActionTypes.DATA.SPATIAL_DATA_SOURCES,
+		beCategoryPath
+	);
+};
 // ============ creators ===========
 /**
  * It ensure adding index and adding received spatialDataSources from BE.
@@ -60,4 +75,5 @@ export default {
 	receiveIndexed,
 	updateStore,
 	useKeys,
+	ensureIndexed,
 };

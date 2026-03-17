@@ -4,6 +4,7 @@ import _ from 'lodash';
 import {map as mapUtils} from '@gisatcz/ptr-utils';
 import {mapConstants} from '@gisatcz/ptr-core';
 import {grid} from '@gisatcz/ptr-tile-grid';
+import commonHelpers from '../_common/helpers';
 
 /* === HELPERS ======================================================================= */
 
@@ -44,34 +45,31 @@ const mergeBackgroundLayerWithLayers = createCachedSelector(
 );
 
 /**
- * Merge given modifiers with layer's modifiers & given filterByActive with layer's filter by active and add it to the layer state
+ * Merge given activeKeys with layer's modifiers with layer's filter by active and add it to the layer state
  *
- * @param layers {Object} layers state
- * @param metadataModifiers {Object} modifiers like scopeKey, placeKey
- * @param filterByActive {{scope: bool, place: bool, period: bool,  scenario: bool, case: bool}}
+ * @param layer {Object} layers state
+ * @param activeKeys {Object} {activeScopeKey: 'bbb', activePlaceKeys: ['ddd', 'eee'], ...}
  * @return {Object} Final layer state definition
  */
-const mergeModifiersAndFilterByActiveToLayerStructure = (
-	layers,
-	metadataModifiers,
-	filterByActive
-) => {
-	return layers.map(layer => {
-		let layerMetadataModifiers =
-			layer.metadataModifiers && metadataModifiers
-				? {...metadataModifiers, ...layer.metadataModifiers}
-				: metadataModifiers || layer.metadataModifiers || null;
-		let layerFilterByActive =
-			layer.filterByActive && filterByActive
-				? {...filterByActive, ...layer.filterByActive}
-				: filterByActive || layer.filterByActive || null;
+const mergeModifiersAndFilterByActiveToLayerStructure = (layer, activeKeys) => {
+	let layerMetadataModifiers = {
+		...(layer.metadataModifiers ? layer.metadataModifiers : {}),
+	};
+	let layerFilterByActive = {
+		...(layer.filterByActive ? layer.filterByActive : {}),
+	};
 
-		return {
-			...layer,
-			metadataModifiers: layerMetadataModifiers,
-			filterByActive: layerFilterByActive,
-		};
-	});
+	const mergedModifiers = commonHelpers.mergeFilters(
+		activeKeys,
+		{...layerFilterByActive},
+		layerMetadataModifiers
+	);
+
+	return {
+		...layer,
+		metadataModifiers: mergedModifiers,
+		filterByActive: null,
+	};
 };
 
 /**
@@ -132,6 +130,28 @@ const getPreviousView = (map, set) => {
 		}
 	} else {
 		return null;
+	}
+};
+
+/**
+ * It transform filter object to active keys object.
+ * Filter object has keys named like metadata [caseKey, applicationKey, periodKey...],
+ * transfroem function convert them to [activeCaseKey, activeApplicationKey, activePeriodKey...].
+ * @param {Object} filter
+ * @returns {Object}
+ */
+const transformFilterToActiveKeys = (filter = {}) => {
+	if (filter) {
+		return {
+			...Object.fromEntries(
+				Object.entries(filter).map(([key, val]) => {
+					// example: caseKey -> activeCaseKey
+					return [`active${key.charAt(0).toUpperCase()}${key.slice(1)}`, val];
+				})
+			),
+		};
+	} else {
+		return {};
 	}
 };
 
@@ -225,4 +245,5 @@ export default {
 	mergeBackgroundLayerWithLayers,
 	mergeModifiersAndFilterByActiveToLayerStructure,
 	getDefaultCogStyle,
+	transformFilterToActiveKeys,
 };

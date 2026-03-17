@@ -3,23 +3,29 @@ import ActionTypes from '../../../constants/ActionTypes';
 import common from '../../_common/actions';
 import Select from '../../Select';
 
+export const dataType = 'areaTrees';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 
 const setActiveKey = common.setActiveKey(ActionTypes.AREAS.AREA_TREES);
 const useIndexed = common.useIndexed(
 	Select.areas.areaTrees.getSubstate,
-	'areaTrees',
-	ActionTypes.AREAS.AREA_TREES
+	dataType,
+	ActionTypes.AREAS.AREA_TREES,
+	beCategoryPath
 );
 const useKeys = common.useKeys(
 	Select.areas.areaTrees.getSubstate,
-	'areaTrees',
-	ActionTypes.AREAS.AREA_TREES
+	dataType,
+	ActionTypes.AREAS.AREA_TREES,
+	beCategoryPath
 );
 const refreshUses = common.refreshUses(
 	Select.areas.areaTrees.getSubstate,
-	`areaTrees`,
-	ActionTypes.AREAS.AREA_TREES
+	dataType,
+	ActionTypes.AREAS.AREA_TREES,
+	beCategoryPath
 );
 
 // ============ actions ===========

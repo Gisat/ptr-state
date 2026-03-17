@@ -88,7 +88,7 @@ describe('state/Data/Components/actions/ensure', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 			if (
@@ -775,7 +775,7 @@ describe('state/Data/Components/actions/ensure', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 

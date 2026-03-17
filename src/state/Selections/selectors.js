@@ -80,6 +80,7 @@ const prepareSelectionByLayerStateSelected = createRecomputeSelector(
 						populatedSelections[key].colourPalette =
 							selectionData.colourPalette;
 					}
+
 					if (style) {
 						populatedSelections[key].style = style;
 						populatedSelections[key].hoveredStyle = hoveredStyle;
@@ -110,6 +111,8 @@ export default {
 	getAllAsObject,
 
 	getAllAsObjectWithStyles,
+	getByKey,
+
 	getByKey,
 
 	prepareSelectionByLayerStateSelected,

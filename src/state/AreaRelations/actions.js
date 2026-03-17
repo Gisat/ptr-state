@@ -2,6 +2,9 @@ import ActionTypes from '../../constants/ActionTypes';
 import Select from '../Select';
 import common from '../_common/actions';
 
+export const dataType = 'area';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 const useIndexedRegister = common.useIndexedRegister(
 	ActionTypes.AREA_RELATIONS
@@ -9,13 +12,13 @@ const useIndexedRegister = common.useIndexedRegister(
 const ensureIndexed = (filter, order, start, length) =>
 	common.ensureIndexed(
 		Select.areaRelations.getSubstate,
-		'area',
+		dataType,
 		filter,
 		order,
 		start,
 		length,
 		ActionTypes.AREA_RELATIONS,
-		'relations'
+		beCategoryPath
 	);
 const add = common.add(ActionTypes.AREA_RELATIONS);
 const addIndex = common.addIndex(ActionTypes.AREA_RELATIONS);

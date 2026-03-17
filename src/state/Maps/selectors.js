@@ -25,7 +25,6 @@ import AppSelectors from '../App/selectors';
 import DataSelectors from '../Data/selectors';
 import SelectionsSelectors from '../Selections/selectors';
 import StylesSelectors from '../Styles/selectors';
-import helpers from './selectorHelpers';
 
 /* === SELECTORS ======================================================================= */
 
@@ -36,7 +35,7 @@ const getAllMapsInUse = state => state.maps.inUse.maps;
 const getActiveMapKey = state => state.maps.activeMapKey;
 const getActiveSetKey = state => state.maps.activeSetKey;
 const getMapsAsObject = state => state.maps.maps;
-const getMapSetsAsObject = state => state.maps.sets;
+const getMapSetsAsObject = state => state?.maps?.sets;
 
 const getActiveMap = createSelector(
 	[getMapsAsObject, getActiveMapKey],
@@ -270,6 +269,14 @@ const getMapSetMapKeys = createSelector([getMapSetByKey], set => {
  * @param state {Object}
  * @param setKey {string}
  */
+const getMapSetActive3DByKey = createSelector([getMapSetByKey], set => {
+	return set?.data?.active3D === true;
+});
+
+/**
+ * @param state {Object}
+ * @param setKey {string}
+ */
 const getMapSetMaps = createSelector(
 	[getMapsAsObject, getMapSetMapKeys],
 	(maps, mapKeys) => {
@@ -319,6 +326,14 @@ const getMapBackgroundLayerStateByMapKey = createSelector(
  * @param state {Object}
  * @param mapKey {string}
  */
+const getMapActive3DByMapKey = createSelector([getMapByKey], map => {
+	return map?.data?.active3D === true;
+});
+
+/**
+ * @param state {Object}
+ * @param mapKey {string}
+ */
 const getMapLayersStateByMapKey = createSelector([getMapByKey], map => {
 	return map?.data?.layers || null;
 });
@@ -340,6 +355,7 @@ const getMapLayerStateByMapKeyAndLayerKey = createSelector(
 );
 
 /**
+ * It find mapSet wher mapKey belongs and return mapSet background layer definition.
  * @param state {Object}
  * @param mapKey {string}
  */
@@ -351,6 +367,16 @@ const getMapSetBackgroundLayerStateByMapKey = createSelector(
 );
 
 /**
+ * Get active3D property value which belongs to given mapSetKey
+ * @param state {Object}
+ * @param mapKey {string}
+ */
+const getMapSetActive3DByMapKey = createSelector([getMapSetByMapKey], set => {
+	return set?.data?.active3D === true;
+});
+
+/**
+ * It find mapSet wher mapKey belongs and return mapSet layers definition.
  * @param state {Object}
  * @param mapKey {string}
  */
@@ -362,6 +388,7 @@ const getMapSetLayersStateByMapKey = createSelector(
 );
 
 /**
+ * It find map by mapKey and return map metadataModifiers.
  * @param state {Object}
  * @param mapKey {string}
  */
@@ -370,6 +397,7 @@ const getMapMetadataModifiersByMapKey = createSelector([getMapByKey], map => {
 });
 
 /**
+ * It find mapSet wher mapKey belongs and return mapSet metadataModifiers.
  * @param state {Object}
  * @param mapKey {string}
  */
@@ -379,8 +407,20 @@ const getMapSetMetadataModifiersByMapKey = createSelector(
 		return set?.data?.metadataModifiers || null;
 	}
 );
+/**
+ * It find mapSet by mapSetKey and return metadataModifiers.
+ * @param state {Object}
+ * @param mapSetKey {string}
+ */
+const getMapSetMetadataModifiersByMapSetKey = createSelector(
+	[getMapSetByKey],
+	set => {
+		return set?.data?.metadataModifiers || null;
+	}
+);
 
 /**
+ * It merge map and mapSet modifiers which are related to mapKey.
  * @param state {Object}
  * @param mapKey {string}
  */
@@ -396,6 +436,19 @@ const getMetadataModifiersByMapKey = createCachedSelector(
 )((state, mapKey) => mapKey);
 
 /**
+ * Return "filterByActive" object which is in map set definition by "mapSetKey".
+ * @param state {Object}
+ * @param mapSetKey {string}
+ */
+const getMapSetFilterByActiveByMapSetKey = createSelector(
+	[getMapSetByKey],
+	set => {
+		return set?.data?.filterByActive || null;
+	}
+);
+
+/**
+ * Return "filterByActive" object which is in map definition by "mapKey".
  * @param state {Object}
  * @param mapKey {string}
  */
@@ -404,6 +457,7 @@ const getMapFilterByActiveByMapKey = createSelector([getMapByKey], map => {
 });
 
 /**
+ * Return "filterByActive" object which is in map set definition by "mapKey".
  * @param state {Object}
  * @param mapKey {string}
  */
@@ -415,17 +469,78 @@ const getMapSetFilterByActiveByMapKey = createSelector(
 );
 
 /**
+ * Return "filter" object for mapSet by "mapSetKey".
+ * Filter object is merge of modifiers of mapSet and filled "filterByActive" items of mapSet.
+ * FilterByActive is defined on mapSet and is filled by active metedata on application level.
  * @param state {Object}
  * @param mapKey {string}
  */
-const getFilterByActiveByMapKey = createCachedSelector(
-	[getMapFilterByActiveByMapKey, getMapSetFilterByActiveByMapKey],
-	(mapFilter, setFilter) => {
-		if (mapFilter && setFilter) {
-			return {...mapFilter, ...setFilter};
-		} else {
-			return setFilter || mapFilter || null;
-		}
+const getMapSetFilterByMapSetKey = createCachedSelector(
+	[
+		getMapSetMetadataModifiersByMapSetKey,
+		common.getAllActiveKeys,
+		getMapSetFilterByActiveByMapSetKey,
+	],
+	(mapSetMetadataModifiers, allActiveKeys, mapSetFilterByActive) => {
+		const merged = commonHelpers.mergeFilters(
+			allActiveKeys,
+			mapSetFilterByActive,
+			mapSetMetadataModifiers
+		);
+		return merged;
+	}
+)((state, mapSetKey) => mapSetKey);
+
+/**
+ * Return "filter" object for mapSet by "mapKey".
+ * It find mapSet wher mapKey belongs.
+ * Filter object is merge of modifiers of mapSet and filled "filterByActive" items of mapSet.
+ * FilterByActive is defined on mapSet and is filled by active metedata on application level.
+ * @param state {Object}
+ * @param mapKey {string}
+ */
+const getMapSetFilterByMapKey = createRecomputeObserver((state, mapKey) => {
+	const mapSet = getMapSetByMapKey(state, mapKey);
+	if (mapSet && mapSet.key) {
+		return getMapSetFilterByMapSetKey(state, mapSet.key);
+	} else {
+		return null;
+	}
+});
+
+/**
+ *
+ * Filter object is merge of modifiers of map and filled "filterByActive" items of map.
+ * FilterByActive is defined on map and is filled by active metedata on parent mapSet (only if map belongs to mapSet) and application level.
+ * MapSet modifiers overwrite application modifiers and map overwrite its merge.
+ * @param state {Object}
+ * @param mapKey {string}
+ */
+const getMapFilterByMapKey = createCachedSelector(
+	[
+		getMapMetadataModifiersByMapKey,
+		getMapFilterByActiveByMapKey,
+		common.getAllActiveKeys,
+		(state, mapKey) => mapKey,
+	],
+	(mapMetadataModifiers, mapFilterByActive, activeKeys = {}, mapKey) => {
+		const mapSetFilter = getMapSetFilterByMapKey(mapKey) || {};
+		const mapSetActiveKeys =
+			selectorHelpers.transformFilterToActiveKeys(mapSetFilter);
+
+		const mergedActiveKeys = {
+			...activeKeys,
+			...mapSetActiveKeys,
+		};
+
+		const merged =
+			commonHelpers.mergeFilters(
+				mergedActiveKeys,
+				mapFilterByActive,
+				mapMetadataModifiers
+			) || {};
+
+		return {...mapSetFilter, ...merged};
 	}
 )((state, mapKey) => mapKey);
 
@@ -440,11 +555,15 @@ const getBackgroundLayerStateByMapKey = createCachedSelector(
 	}
 )((state, mapKey) => mapKey);
 
+/**
+ * Observer selector for getBackgroundLayerStateByMapKey
+ */
 const getBackgroundLayerStateByMapKeyObserver = createRecomputeObserver(
 	getBackgroundLayerStateByMapKey
 );
 
 /**
+ * Apply mapSet and application metadataModifiers and filterByActive on mapSet layers definition.
  * @param state {Object}
  * @param mapKey {string}
  * @return {Object} Merged mapSetState with metadataModifiers and filterByActive.
@@ -452,16 +571,26 @@ const getBackgroundLayerStateByMapKeyObserver = createRecomputeObserver(
 const getMapSetLayersStateWithModifiersByMapKey = createCachedSelector(
 	[
 		getMapSetLayersStateByMapKey,
-		getMapSetMetadataModifiersByMapKey,
-		getMapSetFilterByActiveByMapKey,
+		common.getAllActiveKeys,
+		(state, mapSetKey) => mapSetKey,
 	],
-	(setLayers, metadataModifiers, mapSetFilterByActive) => {
+	(setLayers, activeKeys, mapSetKey) => {
 		if (setLayers?.length) {
-			return selectorHelpers.mergeModifiersAndFilterByActiveToLayerStructure(
-				setLayers,
-				metadataModifiers,
-				mapSetFilterByActive
-			);
+			const metadataModifiers = getMapSetFilterByMapKey(mapSetKey);
+			return setLayers.map(layer => {
+				const mapSetActiveKeys =
+					selectorHelpers.transformFilterToActiveKeys(metadataModifiers);
+
+				const mergedActiveKeys = {
+					...activeKeys,
+					...mapSetActiveKeys,
+				};
+
+				return selectorHelpers.mergeModifiersAndFilterByActiveToLayerStructure(
+					layer,
+					mergedActiveKeys
+				);
+			});
 		} else {
 			return null;
 		}
@@ -469,23 +598,29 @@ const getMapSetLayersStateWithModifiersByMapKey = createCachedSelector(
 )((state, mapKey) => mapKey);
 
 /**
+ * Apply map, mapSet and application metadataModifiers and filterByActive on mapSet layers definition.
  * @param state {Object}
  * @param mapKey {string}
  * @return {Object} Merged mapState with metadataModifiers and filterByActive.
  */
 const getMapLayersStateWithModifiersByMapKey = createCachedSelector(
-	[
-		getMapLayersStateByMapKey,
-		getMetadataModifiersByMapKey,
-		getFilterByActiveByMapKey,
-	],
-	(mapLayers, metadataModifiers, mapFilterByActive) => {
+	[getMapLayersStateByMapKey, getMapFilterByMapKey, common.getAllActiveKeys],
+	(mapLayers, metadataModifiers, activeKeys) => {
 		if (mapLayers?.length) {
-			return selectorHelpers.mergeModifiersAndFilterByActiveToLayerStructure(
-				mapLayers,
-				metadataModifiers,
-				mapFilterByActive
-			);
+			const mapSetActiveKeys =
+				selectorHelpers.transformFilterToActiveKeys(metadataModifiers);
+
+			const mergedActiveKeys = {
+				...activeKeys,
+				...mapSetActiveKeys,
+			};
+
+			return mapLayers.map(layer => {
+				return selectorHelpers.mergeModifiersAndFilterByActiveToLayerStructure(
+					layer,
+					mergedActiveKeys
+				);
+			});
 		} else {
 			return null;
 		}
@@ -670,13 +805,17 @@ const getVisibleTilesByMapKey = createCachedSelector(
 	],
 	(view, mapWidth, mapHeight) => {
 		if (view?.center && view?.boxRange && mapWidth && mapHeight) {
-			const tiles = helpers.getTiles(
+			const tiles = selectorHelpers.getTiles(
 				mapWidth,
 				mapHeight,
 				view.center,
 				view.boxRange
 			);
-			const level = helpers.getZoomLevel(mapWidth, mapHeight, view.boxRange);
+			const level = selectorHelpers.getZoomLevel(
+				mapWidth,
+				mapHeight,
+				view.boxRange
+			);
 
 			return {
 				tiles,
@@ -817,21 +956,39 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 
 		let options = {...dataSourceOptions, ...layerStateOptions};
 
-		let validType = false;
 		if (type === 'wmts') {
-			validType = true;
 			options.url = dataSourceOptions.url || dataSourceOptions.urls?.[0];
-		} else if (type === 'cog') {
-			validType = true;
+		} else if (type === 'cogBitmap') {
 			options.url = dataSourceOptions.url;
 
-			let style = helpers.getDefaultCogStyle();
+			let style = selectorHelpers.getDefaultCogStyle();
 			if (styleKey) {
 				style = StylesSelectors.getDefinitionByKey(styleKey);
 			}
 			options.style = style;
+		} else if (type === 'mvt') {
+			let selected = null;
+			let style = options?.style;
+
+			if (options?.selected) {
+				selected = SelectionsSelectors.prepareSelectionByLayerStateSelected(
+					options.selected
+				);
+			}
+
+			if (!style && styleKey) {
+				style = StylesSelectors.getDefinitionByKey(styleKey);
+			}
+
+			options = {
+				...options,
+				url: dataSourceOptions.url,
+				...(selected && {selected}),
+				...(style && {style}),
+				fidColumnName: dataSourceOptions.uniqueIdProperty,
+				geometryColumnName,
+			};
 		} else if (type === 'wms') {
-			validType = true;
 			let {url, params, configuration, ...rest} = dataSourceOptions;
 			const singleTile =
 				configuration && Object.hasOwn(configuration, 'singleTile')
@@ -885,7 +1042,6 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 			type === 'tiledVector' ||
 			type === 'tiled-vector'
 		) {
-			validType = true;
 			let features,
 				tiles = null;
 
@@ -955,18 +1111,14 @@ const getFinalLayerByDataSourceAndLayerState = createRecomputeSelector(
 			};
 		}
 
-		if (validType) {
-			return {
-				key: layerKey + '_' + spatialDataSource.key,
-				layerKey,
-				opacity: opacity || opacity === 0 ? opacity : 1,
-				name,
-				type,
-				options,
-			};
-		} else {
-			return null;
-		}
+		return {
+			key: layerKey + '_' + spatialDataSource?.key,
+			layerKey,
+			opacity: opacity || opacity === 0 ? opacity : 1,
+			name,
+			type,
+			options,
+		};
 	},
 	recomputeSelectorOptions
 );
@@ -1031,7 +1183,10 @@ const getMapLayers = createRecomputeSelector((mapKey, layersState) => {
 		_forEach(layersState, layerState => {
 			// layer is already defined by the end format suitable for presentational map component
 			if (layerState.type) {
-				if (layerState.type === 'vector' && layerState.options?.selected) {
+				if (
+					(layerState.type === 'mvt' && layerState.options?.selected) ||
+					(layerState.type === 'vector' && layerState.options?.selected)
+				) {
 					layerState = {
 						...layerState,
 						options: {
@@ -1054,9 +1209,26 @@ const getMapLayers = createRecomputeSelector((mapKey, layersState) => {
 					getAttributeRelationsFilterFromLayerState(layerState);
 				const attributeDataFilter =
 					getAttributeDataFilterFromLayerState(layerState);
+
+				// FIXME -> is it correct?
+				// relationFilter should be without modifiers
+				const relationFilter = {
+					// ...(styleKey ? {styleKey} : {}), ???
+					...spatialRelationsFilter,
+					...(spatialRelationsFilter &&
+					Object.values(spatialRelationsFilter).length > 0
+						? spatialRelationsFilter.modifiers
+						: {}),
+					...(spatialRelationsFilter.layerTemplateKey
+						? {layerTemplateKey: spatialRelationsFilter.layerTemplateKey}
+						: {}),
+				};
+				delete relationFilter.modifiers;
+
 				const spatialDataSources =
 					DataSelectors.spatialDataSources.getIndexed_recompute(
-						spatialRelationsFilter
+						// spatialRelationsFilter
+						relationFilter
 					);
 				const attributeDataSourceKeyAttributeKeyPairs =
 					DataSelectors.attributeRelations.getFilteredAttributeDataSourceKeyAttributeKeyPairs(
@@ -1064,6 +1236,22 @@ const getMapLayers = createRecomputeSelector((mapKey, layersState) => {
 					);
 				if (spatialDataSources) {
 					_forEach(spatialDataSources, dataSource => {
+						const dataSourceType = dataSource?.data?.type;
+
+						// Skip data sources with unsupported types
+						const supportedTypes = [
+							'wmts',
+							'wms',
+							'vector',
+							'tiledVector',
+							'tiled-vector',
+							'mvt',
+							'cogBitmap',
+						];
+						if (!supportedTypes.includes(dataSourceType)) {
+							return;
+						}
+
 						finalLayers.push(
 							getFinalLayerByDataSourceAndLayerState(
 								dataSource,
@@ -1081,7 +1269,7 @@ const getMapLayers = createRecomputeSelector((mapKey, layersState) => {
 			}
 		});
 
-		return finalLayers.length ? finalLayers : null;
+		return finalLayers.length ? finalLayers : [null];
 	} else {
 		return null;
 	}
@@ -1107,7 +1295,6 @@ export default {
 	getAttributeRelationsFilterFromLayerState,
 
 	getBackgroundLayerStateByMapKey,
-	getFilterByActiveByMapKey,
 	getFinalLayerByDataSourceAndLayerState,
 	getLayerStateByLayerKeyAndMapKey,
 	getLayersStateByMapKey,
@@ -1116,8 +1303,12 @@ export default {
 	getLayersStateWithMergedFiltersByMapKeyObserver,
 	getMetadataModifiersByMapKey,
 
+	getMapSetFilterByMapSetKey,
+	getMapFilterByMapKey,
+
 	getMapBackgroundLayerStateByMapKey,
 	getMapBackgroundLayer,
+	getMapActive3DByMapKey,
 	getMapByKey,
 	getMapFilterByActiveByMapKey,
 	getMapLayerStateByMapKeyAndLayerKey,
@@ -1131,6 +1322,8 @@ export default {
 	getMapSetActiveMapView,
 	getMapSetActiveMapViewport,
 	getMapSetActiveMapLayers,
+	getMapSetActive3DByMapKey,
+	getMapSetActive3DByKey,
 	getMapSetBackgroundLayerStateByMapKey,
 	getMapSetByMapKey,
 	getMapSetByKey,

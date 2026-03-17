@@ -50,7 +50,7 @@ export default function request(
 	let url =
 		localConfig.apiBackendProtocol +
 		'://' +
-		path.join(localConfig.apiBackendHost, localConfig.apiBackendPath, apiPath);
+		path.join(localConfig.apiBackendHost, apiPath);
 	if (query) {
 		url += '?' + queryString.stringify(query);
 	}
@@ -72,7 +72,11 @@ export default function request(
 				contentType.indexOf('application/json') !== -1
 			) {
 				return response.json().then(body => {
-					if (dataPath === null || (dataPath && _.get(body, dataPath))) {
+					//FIXME if body array
+					// it is caused by new BE
+					if (Array.isArray(body)) {
+						return {body, status: response.status};
+					} else if (dataPath === null || (dataPath && _.get(body, dataPath))) {
 						return {
 							...body,
 							status: response.status,

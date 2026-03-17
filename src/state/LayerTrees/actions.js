@@ -3,25 +3,28 @@ import Select from '../Select';
 
 import common from '../_common/actions';
 
+export const dataType = 'layerTrees';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 const add = common.add(ActionTypes.LAYER_TREES);
 const create = common.create(
 	Select.layerTrees.getSubstate,
-	'layerTrees',
+	dataType,
 	ActionTypes.LAYER_TREES,
-	'application'
+	beCategoryPath
 );
 const deleteItem = common.delete(
 	Select.layerTrees.getSubstate,
-	'layerTrees',
+	dataType,
 	ActionTypes.LAYER_TREES,
-	'application'
+	beCategoryPath
 );
 const saveEdited = common.saveEdited(
 	Select.layerTrees.getSubstate,
-	'layerTrees',
+	dataType,
 	ActionTypes.LAYER_TREES,
-	'application'
+	beCategoryPath
 );
 const updateEdited = common.updateEdited(
 	Select.layerTrees.getSubstate,
@@ -29,24 +32,24 @@ const updateEdited = common.updateEdited(
 );
 const useKeys = common.useKeys(
 	Select.layerTrees.getSubstate,
-	'layerTrees',
+	dataType,
 	ActionTypes.LAYER_TREES,
-	'application'
+	beCategoryPath
 );
 const useKeysClear = common.useKeysClear(ActionTypes.LAYER_TREES);
 const useIndexedClear = common.useIndexedClear(ActionTypes.LAYER_TREES);
 const clearIndex = common.clearIndex(ActionTypes.LAYER_TREES);
 const useIndexed = common.useIndexed(
 	Select.layerTrees.getSubstate,
-	'layerTrees',
+	dataType,
 	ActionTypes.LAYER_TREES,
-	'application'
+	beCategoryPath
 );
 const refreshUses = common.refreshUses(
 	Select.layerTrees.getSubstate,
-	'layerTrees',
+	dataType,
 	ActionTypes.LAYER_TREES,
-	'application'
+	beCategoryPath
 );
 const updateStateFromView = common.updateSubstateFromView(
 	ActionTypes.LAYER_TREES

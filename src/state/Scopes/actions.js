@@ -3,23 +3,29 @@ import Select from '../Select';
 import common from '../_common/actions';
 import _ from 'lodash';
 
+export const dataType = 'scopes';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 
 const add = common.add(ActionTypes.SCOPES);
 const create = common.create(
 	Select.scopes.getSubstate,
-	'scopes',
-	ActionTypes.SCOPES
+	dataType,
+	ActionTypes.SCOPES,
+	beCategoryPath
 );
 const deleteItem = common.delete(
 	Select.scopes.getSubstate,
-	'scopes',
-	ActionTypes.SCOPES
+	dataType,
+	ActionTypes.SCOPES,
+	beCategoryPath
 );
 const saveEdited = common.saveEdited(
 	Select.scopes.getSubstate,
-	'scopes',
-	ActionTypes.SCOPES
+	dataType,
+	ActionTypes.SCOPES,
+	beCategoryPath
 );
 const setActiveKey = common.setActiveKey(ActionTypes.SCOPES);
 const setActiveKeys = common.setActiveKeys(ActionTypes.SCOPES);
@@ -29,21 +35,24 @@ const updateEdited = common.updateEdited(
 );
 const useKeys = common.useKeys(
 	Select.scopes.getSubstate,
-	'scopes',
-	ActionTypes.SCOPES
+	dataType,
+	ActionTypes.SCOPES,
+	beCategoryPath
 );
 const useKeysClear = common.useKeysClear(ActionTypes.SCOPES);
 const useIndexedClear = common.useIndexedClear(ActionTypes.SCOPES);
 const useIndexed = common.useIndexed(
 	Select.scopes.getSubstate,
-	'scopes',
-	ActionTypes.SCOPES
+	dataType,
+	ActionTypes.SCOPES,
+	beCategoryPath
 );
 const clearIndex = common.clearIndex(ActionTypes.SCOPES);
 const refreshUses = common.refreshUses(
 	Select.scopes.getSubstate,
-	`scopes`,
-	ActionTypes.SCOPES
+	dataType,
+	ActionTypes.SCOPES,
+	beCategoryPath
 );
 
 const setActiveKeyAndEnsureDependencies = key => {

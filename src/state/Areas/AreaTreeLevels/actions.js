@@ -3,23 +3,29 @@ import ActionTypes from '../../../constants/ActionTypes';
 import common from '../../_common/actions';
 import Select from '../../Select';
 
+export const dataType = 'areaTreeLevels';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 
 const setActiveKey = common.setActiveKey(ActionTypes.AREAS.AREA_TREE_LEVELS);
 const useIndexed = common.useIndexed(
 	Select.areas.areaTreeLevels.getSubstate,
-	'areaTreeLevels',
-	ActionTypes.AREAS.AREA_TREE_LEVELS
+	dataType,
+	ActionTypes.AREAS.AREA_TREE_LEVELS,
+	beCategoryPath
 );
 const useKeys = common.useKeys(
 	Select.areas.areaTreeLevels.getSubstate,
-	'areaTreeLevels',
-	ActionTypes.AREAS.AREA_TREE_LEVELS
+	dataType,
+	ActionTypes.AREAS.AREA_TREE_LEVELS,
+	beCategoryPath
 );
 const refreshUses = common.refreshUses(
 	Select.areas.areaTreeLevels.getSubstate,
 	`areaTreeLevels`,
-	ActionTypes.AREAS.AREA_TREE_LEVELS
+	ActionTypes.AREAS.AREA_TREE_LEVELS,
+	beCategoryPath
 );
 
 const setActiveKeyAndEnsureDependencies = key => {

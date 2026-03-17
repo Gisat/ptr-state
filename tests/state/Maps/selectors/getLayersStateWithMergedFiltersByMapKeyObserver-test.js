@@ -10,7 +10,6 @@ describe('getLayersStateWithMergedFiltersByMapKeyObserver', function () {
 			layerTemplateKey: 'layerTemplate2',
 			metadataModifiers: {
 				periodKey: 'period1',
-				scopeKey: 'scope1',
 			},
 		},
 		{
@@ -20,7 +19,7 @@ describe('getLayersStateWithMergedFiltersByMapKeyObserver', function () {
 			styleKey: 'style1',
 			metadataModifiers: {
 				placeKey: 'place1',
-				scopeKey: 'scope1',
+
 				scenarioKeys: ['scenario1', 'scenario2'],
 			},
 		},
@@ -38,9 +37,7 @@ describe('getLayersStateWithMergedFiltersByMapKeyObserver', function () {
 					],
 				},
 			},
-			metadataModifiers: {
-				scopeKey: 'scope1',
-			},
+			metadataModifiers: {},
 		},
 	];
 
@@ -50,7 +47,6 @@ describe('getLayersStateWithMergedFiltersByMapKeyObserver', function () {
 			layerTemplateKey: 'layerTemplate2',
 			metadataModifiers: {
 				periodKey: 'period1',
-				scopeKey: 'scope1',
 			},
 		},
 		{
@@ -60,8 +56,6 @@ describe('getLayersStateWithMergedFiltersByMapKeyObserver', function () {
 			styleKey: 'style3',
 			metadataModifiers: {
 				placeKey: 'place2',
-				periodKey: 'period2',
-				scopeKey: 'scope1',
 			},
 		},
 	];
@@ -70,7 +64,6 @@ describe('getLayersStateWithMergedFiltersByMapKeyObserver', function () {
 		setState(state);
 		const output =
 			Select.maps.getLayersStateWithMergedFiltersByMapKeyObserver('map1');
-		debugger;
 		assert.deepStrictEqual(output, expectedResult);
 		setState(null);
 	});

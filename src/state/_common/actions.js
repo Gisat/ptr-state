@@ -1,4 +1,4 @@
-import _, {isEqual} from 'lodash';
+import _, {isEqual, omit} from 'lodash';
 import path from 'path';
 import moment from 'moment';
 
@@ -28,13 +28,11 @@ const add = action => {
 const apiDelete = (dataType, categoryPath, data) => {
 	return (dispatch, getState) => {
 		const localConfig = Select.app.getCompleteLocalConfiguration(getState());
-		const apiPath = 'rest/' + categoryPath;
+		const apiPath = path.join(categoryPath, 'nodes/remove');
 		const payload = {
-			data: {
-				[dataType]: data,
-			},
+			keys: [data[0].key],
 		};
-		return request(localConfig, apiPath, 'DELETE', null, payload)
+		return request(localConfig, apiPath, 'PATCH', null, payload, null, null)
 			.then(result => {
 				if (
 					(result.errors && result.errors[dataType]) ||
@@ -44,7 +42,7 @@ const apiDelete = (dataType, categoryPath, data) => {
 						actionGeneralError(result.errors[dataType] || new Error('no data'))
 					);
 				} else {
-					const itemsDeleted = result.data[dataType];
+					const itemsDeleted = result.keys;
 					if (itemsDeleted.length > 0) {
 						return result;
 					} else {
@@ -67,13 +65,9 @@ const apiUpdate = (
 ) => {
 	return (dispatch, getState) => {
 		const localConfig = Select.app.getCompleteLocalConfiguration(getState());
-		const apiPath = 'rest/' + categoryPath;
-		const payload = {
-			data: {
-				[dataType]: editedData,
-			},
-		};
-		return request(localConfig, apiPath, 'PUT', null, payload)
+		const apiPath = path.join(categoryPath, 'nodes/change');
+		const payload = editedData;
+		return request(localConfig, apiPath, 'PATCH', null, payload, null, null)
 			.then(result => {
 				if (
 					(result.errors && result.errors[dataType]) ||
@@ -83,15 +77,20 @@ const apiUpdate = (
 						actionGeneralError(result.errors[dataType] || new Error('no data'))
 					);
 				} else {
-					dispatch(
-						receiveUpdated(
-							getSubstate,
-							actionTypes,
-							result,
-							dataType,
-							categoryPath
-						)
-					);
+					const updateNodeKey = result.body[0];
+					return dispatch(
+						loadKey(dataType, actionTypes, updateNodeKey, categoryPath)
+					).then(item => {
+						dispatch(
+							receiveUpdated(
+								getSubstate,
+								actionTypes,
+								item,
+								dataType,
+								categoryPath
+							)
+						);
+					});
 				}
 			})
 			.catch(error => {
@@ -202,8 +201,7 @@ const deleteItem = (
 			return dispatch(
 				apiDelete(dataType, categoryPath, [{key: item.key}])
 			).then(result => {
-				const data = result.data[dataType];
-				const deletedKeys = data.map(d => d.key);
+				const deletedKeys = result.keys;
 
 				//Check if item deleted
 				if (isEqual(deletedKeys, [item.key])) {
@@ -300,8 +298,12 @@ const saveEdited = (
 
 			if (saved) {
 				// update
+				//FIXME
+				const editedRestructured = {key: edited.key, ...edited.data};
 				return dispatch(
-					apiUpdate(getSubstate, dataType, actionTypes, categoryPath, [edited])
+					apiUpdate(getSubstate, dataType, actionTypes, categoryPath, [
+						editedRestructured,
+					])
 				);
 			} else {
 				// create
@@ -327,9 +329,15 @@ const useKeys = (
 				dispatch(actionUseKeysRegister(actionTypes, componentId, keys));
 			}
 
-			return dispatch(
-				ensureKeys(getSubstate, dataType, actionTypes, keys, categoryPath)
-			);
+			if (keys.length === 1) {
+				return dispatch(
+					ensureKey(getSubstate, dataType, actionTypes, keys[0], categoryPath)
+				);
+			} else {
+				return dispatch(
+					ensureKeys(getSubstate, dataType, actionTypes, keys, categoryPath)
+				);
+			}
 		};
 	};
 };
@@ -459,6 +467,20 @@ function requestWrapper(
 	};
 }
 
+function processPatchResponse(response, dataType) {
+	const transformedResponse = response
+		.filter(r => r.nodeType === dataType)
+		.map(r => {
+			// eslint-disable-next-line no-unused-vars
+			const {key, nodeType, ...rest} = r;
+			return {
+				key,
+				data: rest || {},
+			};
+		});
+	return transformedResponse;
+}
+
 function create(
 	getSubstate,
 	dataType,
@@ -468,7 +490,7 @@ function create(
 	return (key, appKey) => {
 		return (dispatch, getState) => {
 			const state = getState();
-			const apiPath = path.join('rest', categoryPath);
+			const apiPath = path.join(categoryPath, 'nodes/change');
 			const localConfig = Select.app.getCompleteLocalConfiguration(state);
 
 			let applicationKey = null;
@@ -482,7 +504,7 @@ function create(
 			}
 
 			const payload = getCreatePayload(dataType, key, applicationKey);
-			return request(localConfig, apiPath, 'POST', null, payload)
+			return request(localConfig, apiPath, 'PATCH', null, payload, null, null)
 				.then(result => {
 					if (
 						(result.errors && result.errors[dataType]) ||
@@ -494,7 +516,9 @@ function create(
 							)
 						);
 					} else {
-						const items = result.data[dataType];
+						// FIXME - response should have stable structure
+						const items = processPatchResponse(result.body, dataType);
+
 						dispatch(actionAdd(actionTypes, items));
 
 						let indexes = [];
@@ -565,6 +589,28 @@ function ensureKeys(
 					)
 				);
 			});
+		}
+
+		return Promise.all(promises);
+	};
+}
+
+function ensureKey(
+	getSubstate,
+	dataType,
+	actionTypes,
+	key,
+	categoryPath = DEFAULT_CATEGORY_PATH
+) {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		let keysToLoad = commonSelectors.getKeysToLoad(getSubstate)(state, [key]);
+		let promises = [];
+		if (keysToLoad) {
+			promises.push(
+				dispatch(loadKey(dataType, actionTypes, keysToLoad[0], categoryPath))
+			);
 		}
 
 		return Promise.all(promises);
@@ -702,6 +748,30 @@ function ensureIndexed(
 	};
 }
 
+function processResponse(response, dataType) {
+	const transformedResponse = response
+		.filter(r => r.nodeType === dataType)
+		.map(r => {
+			const {key, data, ...rest} = r;
+			const entity = {
+				key: key,
+				data: data || rest || {},
+			};
+
+			entity.data = omit(entity.data, ['lastUpdatedAt', 'nodeType']);
+			return entity;
+		});
+
+	return {
+		data: {
+			[dataType]: transformedResponse,
+		},
+		// total: response.total,
+		total: response.total || transformedResponse.length,
+		changes: response.changes,
+	};
+}
+
 function loadKeysPage(
 	dataType,
 	actionTypes,
@@ -710,27 +780,66 @@ function loadKeysPage(
 ) {
 	return (dispatch, getState) => {
 		const localConfig = Select.app.getCompleteLocalConfiguration(getState());
-		const apiPath = getAPIPath(categoryPath, dataType);
+		const apiPath = path.join(categoryPath, 'nodes-by-keys');
 		const PAGE_SIZE =
 			localConfig.requestPageSize || configDefaults.requestPageSize;
 
 		let payload = {
-			filter: {
-				key: {
-					in: keys,
-				},
-			},
+			keys: keys,
 			limit: PAGE_SIZE,
 		};
-		return request(localConfig, apiPath, 'POST', null, payload)
+
+		return request(localConfig, apiPath, 'POST', null, payload, null, null)
 			.then(result => {
+				// FIXME - response should have stable structure
+				result = processResponse(result.body, dataType);
 				if (
 					(result.errors && result.errors[dataType]) ||
 					(result.data && !result.data[dataType])
 				) {
 					throw new Error(result.errors[dataType] || 'no data');
 				} else {
-					dispatch(receiveKeys(actionTypes, result, dataType, keys));
+					dispatch(
+						receiveKeys(actionTypes, result.data[dataType], dataType, keys)
+					);
+				}
+			})
+			.catch(error => {
+				dispatch(actionGeneralError(error));
+				return error;
+			});
+	};
+}
+
+function loadKey(
+	dataType,
+	actionTypes,
+	key,
+	categoryPath = DEFAULT_CATEGORY_PATH
+) {
+	return (dispatch, getState) => {
+		const localConfig = Select.app.getCompleteLocalConfiguration(getState());
+		const apiPath = path.join(categoryPath, 'nodes', key);
+
+		return request(localConfig, apiPath, 'GET', null, null, null, null)
+			.then(result => {
+				// FIXME - response should have stable structure
+				// result = processResponse({data: result.data}, dataType);
+				if (
+					(result.errors && result.errors[dataType]) ||
+					(result && result.nodeType !== dataType)
+				) {
+					throw new Error(result.errors[dataType] || 'no data');
+				} else {
+					dispatch(
+						receiveKeys(
+							actionTypes,
+							[{key: result.key, data: result.data}],
+							dataType,
+							[key]
+						)
+					);
+					return result;
 				}
 			})
 			.catch(error => {
@@ -753,16 +862,20 @@ function loadIndexedPage(
 		const localConfig = Select.app.getCompleteLocalConfiguration(getState());
 		const PAGE_SIZE =
 			localConfig.requestPageSize || configDefaults.requestPageSize;
-		const apiPath = getAPIPath(categoryPath, dataType);
+		// const apiPath = getAPIPath(categoryPath, dataType);
+		const apiPath = path.join(categoryPath, 'nodes-by-type-and-edges');
 
 		let payload = {
-			filter: filter && {...filter},
+			edges: filter && Object.values(filter),
+			nodeType: dataType,
 			offset: start - 1,
 			order: order,
 			limit: PAGE_SIZE,
 		};
-		return request(localConfig, apiPath, 'POST', null, payload)
+		return request(localConfig, apiPath, 'POST', null, payload, null, null)
 			.then(result => {
+				// FIXME - response should have stable structure
+				result = processResponse(result.data, dataType);
 				if (
 					(result.errors && result.errors[dataType]) ||
 					(result.data && !result.data[dataType])
@@ -776,6 +889,7 @@ function loadIndexedPage(
 					throw new Error('Index outdated');
 				} else {
 					dispatch(
+						// FIXME - add order, start and result.total/count
 						receiveIndexed(actionTypes, result, dataType, filter, order, start)
 					);
 				}
@@ -877,13 +991,13 @@ function receiveUpdated(
 function receiveKeys(actionTypes, result, dataType, keys) {
 	return dispatch => {
 		// add data to store
-		if (result.data[dataType].length) {
-			dispatch(actionAdd(actionTypes, result.data[dataType]));
+		if (result.length) {
+			dispatch(actionAdd(actionTypes, result));
 		}
 
 		// add unreceived keys
 		_.remove(keys, key => {
-			return _.find(result.data[dataType], {key});
+			return _.find(result, {key});
 		});
 		if (keys.length) {
 			dispatch(actionAddUnreceivedKeys(actionTypes, keys));
@@ -1160,17 +1274,15 @@ const getAPIPath = (categoryPath = DEFAULT_CATEGORY_PATH, dataType) => {
 
 const getCreatePayload = (datatype, key = utils.uuid(), applicationKey) => {
 	const payload = {
-		data: {},
+		key,
+		nodeType: datatype,
 	};
 
-	let model = {key, data: {}};
 	if (applicationKey) {
-		model.data = {applicationKey};
+		payload.applicationKey = applicationKey;
 	}
 
-	payload.data[datatype] = [model];
-
-	return payload;
+	return [payload];
 };
 
 // ============ export ===========
@@ -1193,6 +1305,7 @@ export default {
 	ensureKeys,
 	loadIndexedPage,
 	loadKeysPage,
+	loadKey,
 	receiveIndexed,
 	receiveKeys,
 	receiveUpdated,

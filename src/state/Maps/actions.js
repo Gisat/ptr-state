@@ -15,6 +15,7 @@ import commonActions from '../_common/actions';
 import commonHelpers from '../_common/helpers';
 import commonSelectors from '../_common/selectors';
 
+import SpatialDataSourcesActions from '../Data/SpatialDataSources/actions';
 import DataActions from '../Data/actions';
 import {
 	TILED_VECTOR_LAYER_TYPES,
@@ -218,6 +219,21 @@ const removeMapLayer = (mapKey, layerKey) => {
 	};
 };
 
+// TODO test
+const removeMapLayersByLayerTemplateKey = (mapKey, layerTemplateKey) => {
+	return (dispatch, getState) => {
+		const state = getState();
+		const layersState = Select.maps.getLayersStateByMapKey(state, mapKey);
+		if (layersState?.length) {
+			layersState.forEach(layer => {
+				if (layer.layerTemplateKey === layerTemplateKey) {
+					dispatch(actionRemoveMapLayer(mapKey, layer.key));
+				}
+			});
+		}
+	};
+};
+
 /**
  * Remove all layers satisfying filter from map
  * @param mapKey {string}
@@ -333,6 +349,26 @@ const mapUseRegister = mapKey => {
 };
 
 /**
+ * Set metadataModifiers for map
+ * @param mapKey {string}
+ * @param metadataModifiers {Object}
+ */
+const setMapMetadataModifiers = (mapKey, metadataModifiers) => {
+	return (dispatch, getState) => {
+		const state = getState();
+		const map = Select.maps.getMapByKey(state, mapKey);
+		if (map) {
+			dispatch(actionSetMapMetadataModifiers(mapKey, metadataModifiers));
+			dispatch(use(mapKey, null, null));
+		} else {
+			dispatch(
+				commonActions.actionGeneralError(`No map exists for mapKey ${mapKey}`)
+			);
+		}
+	};
+};
+
+/**
  * @param mapKey {string}
  * @param backgroundLayer {Object} background layer definition
  * @param layers {Object} layers definition
@@ -384,7 +420,7 @@ function use(mapKey, backgroundLayer, layers) {
  * @param layerState {Object} layer definition
  * @param spatialFilter {{level: number}, {tiles: Array}}
  */
-function layerUse(layerState, spatialFilter) {
+function layerUse(layerState) {
 	return (dispatch, getState) => {
 		const state = getState();
 
@@ -397,7 +433,9 @@ function layerUse(layerState, spatialFilter) {
 		if (layerState.layerTemplateKey) {
 			metadataDefinedByKey.layerTemplateKey = layerState.layerTemplateKey;
 			// TODO use layerTemplate here?
-		} else if (layerState.areaTreeLevelKey) {
+		}
+
+		if (layerState.areaTreeLevelKey) {
 			metadataDefinedByKey.areaTreeLevelKey = layerState.areaTreeLevelKey;
 			// TODO use areaTreeLevelKey here?
 		}
@@ -425,12 +463,6 @@ function layerUse(layerState, spatialFilter) {
 			commonHelpers.convertModifiersToRequestFriendlyFormat(modifiers);
 		if (layerTemplateKey || areaTreeLevelKey) {
 			let commonRelationsFilter = {};
-			if (areaTreeLevelKey) {
-				commonRelationsFilter = {
-					...(modifiersForRequest && {modifiers: modifiersForRequest}),
-					areaTreeLevelKey,
-				};
-			}
 
 			if (layerTemplateKey) {
 				commonRelationsFilter = {
@@ -461,6 +493,13 @@ function layerUse(layerState, spatialFilter) {
 				}
 			}
 
+			if (areaTreeLevelKey) {
+				commonRelationsFilter = {
+					...(modifiersForRequest && {modifiers: modifiersForRequest}),
+					areaTreeLevelKey,
+				};
+			}
+
 			const styleKey = layerState.styleKey || null;
 
 			// TODO ensure style here for now
@@ -473,26 +512,70 @@ function layerUse(layerState, spatialFilter) {
 				);
 			}
 
-			const attributeDataFilterExtension = {
-				...(layerState?.options?.attributeFilter && {
-					attributeFilter: layerState.options.attributeFilter,
-				}),
-				...(layerState?.options?.dataSourceKeys && {
-					dataSourceKeys: layerState.options.dataSourceKeys,
-				}),
-				...(layerState?.options?.featureKeys && {
-					featureKeys: layerState.options.featureKeys,
-				}),
-			};
+			// const attributeDataFilterExtension = {
+			// 	...(layerState?.options?.attributeFilter && {
+			// 		attributeFilter: layerState.options.attributeFilter,
+			// 	}),
+			// 	...(layerState?.options?.dataSourceKeys && {
+			// 		dataSourceKeys: layerState.options.dataSourceKeys,
+			// 	}),
+			// 	...(layerState?.options?.featureKeys && {
+			// 		featureKeys: layerState.options.featureKeys,
+			// 	}),
+			// };
 
+			const {modifiers, ...restFilter} = commonRelationsFilter;
+			const relationFilter = {
+				...(styleKey ? {styleKey} : {}),
+				...(modifiers && Object.values(modifiers).length > 0 ? modifiers : {}),
+				...(restFilter && Object.values(restFilter).length > 0
+					? restFilter
+					: {}),
+			};
+			// Ensure spatial data source at the first step
 			dispatch(
-				DataActions.ensure(
-					styleKey,
-					commonRelationsFilter,
-					spatialFilter,
-					attributeDataFilterExtension
-				)
-			);
+				SpatialDataSourcesActions.ensureIndexed(relationFilter, null, 0, 100)
+			).then(() => {
+				const spatialDataSources =
+					Select.data.spatialDataSources.getIndexed_recompute(
+						// spatialRelationsFilter
+						relationFilter
+					);
+
+				const sdsType = spatialDataSources?.[0]?.data?.type;
+
+				if (
+					[...TILED_VECTOR_LAYER_TYPES, ...SINGLE_VECTOR_LAYER_TYPES].includes(
+						sdsType
+					)
+				) {
+					// separate attributes from vectors
+					// same endpoint? for just attribute data
+					// save attributes
+					// save geometry
+					const sds = spatialDataSources[0];
+					const featureIdColumnName = sds?.data?.fidColumnName;
+					// const featureIdColumnName = null;
+					// TODO - get attributes from style?
+					const attributes = [];
+					if (sds) {
+						return dispatch(
+							DataActions.newEnsureData(
+								featureIdColumnName,
+								attributes,
+								sds?.data?.vectorKey,
+								sds?.key,
+								commonRelationsFilter
+							)
+						);
+					}
+				} else {
+					// web type
+					// do nothing
+					// FIXME - remove
+					console.log('xxx_data', spatialDataSources, sdsType);
+				}
+			});
 		}
 	};
 }
@@ -679,6 +762,41 @@ function setMapSetBackgroundLayer(setKey, backgroundLayer) {
 	};
 }
 
+/**
+ * Set active 3D for given mapSetKey
+ * @param {string} setKey
+ * @param {boolean} active3D
+ * @returns
+ */
+function setMapSetActive3D(setKey, active3D) {
+	return (dispatch, getState) => {
+		const mapSet = Select.maps.getMapSetByKey(getState(), setKey);
+		const active3DValid = active3D === true || active3D === false;
+		if (mapSet && active3DValid) {
+			dispatch(actionSetMapSetActive3D(setKey, active3D));
+		} else {
+			console.warn('No mapSet found for set key or active3D invalid.');
+		}
+	};
+}
+
+/**
+ * Set active 3D for given mapKey
+ * @param {string} mapKey
+ * @param {boolean} active3D
+ * @returns
+ */
+function setMapActive3D(mapKey, active3D) {
+	return (dispatch, getState) => {
+		const map = Select.maps.getMapByKey(getState(), mapKey);
+		const active3DValid = active3D === true || active3D === false;
+		if (map && active3DValid) {
+			dispatch(actionSetMapActive3D(mapKey, active3D));
+		} else {
+			console.warn('No map found for key or active3D invalid.');
+		}
+	};
+}
 /**
  * Set background layer for map.
  * @param mapKey {string}
@@ -1022,6 +1140,22 @@ const actionSetMapBackgroundLayer = (mapKey, backgroundLayer) => {
 	};
 };
 
+const actionSetMapActive3D = (mapKey, active3D) => {
+	return {
+		type: ActionTypes.MAPS.MAP.SET_ACTIVE_3D,
+		mapKey,
+		active3D,
+	};
+};
+
+const actionSetMapSetActive3D = (mapSetKey, active3D) => {
+	return {
+		type: ActionTypes.MAPS.SET.SET_ACTIVE_3D,
+		mapSetKey,
+		active3D,
+	};
+};
+
 const actionSetMapSetLayers = (setKey, layers) => {
 	return {
 		type: ActionTypes.MAPS.SET.LAYERS.SET,
@@ -1098,6 +1232,14 @@ const actionMapUseRegister = mapKey => {
 	};
 };
 
+const actionSetMapMetadataModifiers = (mapKey, metadataModifiers) => {
+	return {
+		type: ActionTypes.MAPS.MAP.METADATA_MODIFIERS.SET,
+		mapKey,
+		metadataModifiers,
+	};
+};
+
 // ============ export ===========
 export default {
 	addMap,
@@ -1115,6 +1257,7 @@ export default {
 	removeMap,
 	removeMapFromSet,
 	removeMapLayer,
+	removeMapLayersByLayerTemplateKey,
 	removeMapLayers,
 	removeMapLayersByFilter,
 	removeAllMapLayers: actionRemoveAllMapLayers,
@@ -1127,9 +1270,12 @@ export default {
 	setMapSetActiveMapKey,
 	setMapBackgroundLayer,
 	setMapSetBackgroundLayer,
+	setMapActive3D,
+	setMapSetActive3D,
 	setMapSetLayers,
 	setMapSetSync,
 	setMapViewport,
+	setMapMetadataModifiers,
 	updateMapAndSetView,
 	updateSetView,
 	updateStateFromView,

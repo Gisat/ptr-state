@@ -127,10 +127,7 @@ describe('state/Data/actions/loadMissingSpatialData', function () {
 		};
 
 		setFetch(function (url, options) {
-			assert.strictEqual(
-				'http://localhost/backend/rest/data/filtered',
-				slash(url)
-			);
+			assert.strictEqual('http://localhost/rest/data/filtered', slash(url));
 			if (
 				_.isEqual(options, {
 					body: JSON.stringify({

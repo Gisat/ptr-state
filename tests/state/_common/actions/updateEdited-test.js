@@ -1,5 +1,5 @@
 import commonActions from '../../../../src/state/_common/actions';
-import testBatchRunner from '../../helpers';
+import testBatchRunner, {extendStoreOnPath} from '../../helpers';
 import {commonActionTypesObj as actionTypes} from '../../../constants';
 
 const tests = [
@@ -17,12 +17,22 @@ const tests = [
 				data: {prop: 'val'},
 			});
 		},
-		getState: dataType => () => ({
-			[dataType]: {
+		getState: (dataType, store, storePath) => () => {
+			const baseState = {
+				app: {
+					localConfiguration: {
+						apiBackendProtocol: 'http',
+						apiBackendHost: 'localhost',
+						apiBackendPath: '',
+					},
+				},
+			};
+			const storeState = {
 				byKey: {k1: {key: 'k1'}},
 				editedByKey: {k1: {key: 'k1', data: {prop: 'val'}}},
-			},
-		}),
+			};
+			return extendStoreOnPath(baseState, storePath, storeState);
+		},
 		dispatchedActions: [
 			{
 				type: 'EDITED.UPDATE',
@@ -53,12 +63,22 @@ const tests = [
 			}
 			return action('users', 'k1');
 		},
-		getState: dataType => () => ({
-			[dataType]: {
+		getState: (dataType, store, storePath) => () => {
+			const baseState = {
+				app: {
+					localConfiguration: {
+						apiBackendProtocol: 'http',
+						apiBackendHost: 'localhost',
+						apiBackendPath: '',
+					},
+				},
+			};
+			const storeState = {
 				byKey: {k1: {key: 'k1'}},
 				editedByKey: {k1: {key: 'k1', data: {prop: 'val'}}},
-			},
-		}),
+			};
+			return extendStoreOnPath(baseState, storePath, storeState);
+		},
 		dispatchedActions: [
 			{
 				type: 'EDITED.UPDATE',
@@ -122,7 +142,7 @@ const tests = [
 ];
 
 const dataType = 'testStore';
-const categoryPath = 'metadata';
+const categoryPath = 'be-metadata';
 describe(
 	'updateEdited',
 	testBatchRunner(dataType, categoryPath, tests, commonActions, actionTypes)

@@ -14,6 +14,10 @@ const mapStateToProps = (state, ownProps) => {
 				state,
 				ownProps.stateMapSetKey
 			),
+			active3D: Select.maps.getMapSetActive3DByKey(
+				state,
+				ownProps.stateMapSetKey
+			),
 			maps: Select.maps.getMapSetMapKeys(state, ownProps.stateMapSetKey),
 			view: Select.maps.getMapSetView(state, ownProps.stateMapSetKey),
 			activeMapViewport: Select.maps.getViewportByMapKey(state, activeMapKey),
@@ -62,4 +66,6 @@ const mapDispatchToPropsFactory = () => {
 	};
 };
 
-export default connect(mapStateToProps, mapDispatchToPropsFactory);
+export default connect(mapStateToProps, mapDispatchToPropsFactory, null, {
+	forwardRef: true,
+});
