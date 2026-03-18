@@ -1,6 +1,6 @@
 {
 	"name": "@gisatcz/ptr-state",
-	"version": "3.0.0-dev.0",
+	"version": "3.0.0",
 	"description": "Panther FE state package",
 	"sideEffects": false,
 	"keywords": [
@@ -57,6 +57,7 @@
 		"@gisatcz/prettier-config": "^0.0.3",
 		"@rollup/plugin-babel": "^5.3.0",
 		"@rollup/plugin-commonjs": "^22.0.0",
+		"@semantic-release/git": "^10.0.1",
 		"babel-loader": "^8.2.3",
 		"babel-plugin-istanbul": "^6.1.1",
 		"babel-plugin-lodash": "^3.3.4",
@@ -90,6 +91,22 @@
 				"name": "dev",
 				"prerelease": true
 			}
+		],
+		"plugins": [
+			"@semantic-release/commit-analyzer",
+			"@semantic-release/release-notes-generator",
+			"@semantic-release/npm",
+			[
+				"@semantic-release/git",
+				{
+					"assets": [
+						"package.json",
+						"package-lock.json"
+					],
+					"message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+				}
+			],
+			"@semantic-release/github"
 		]
 	},
 	"scripts": {
