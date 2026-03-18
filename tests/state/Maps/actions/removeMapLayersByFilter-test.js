@@ -33,11 +33,6 @@ describe('state/Maps/actions/removeMapLayersByFilter', function () {
 				placeKey: 'place1',
 				scenarioKeys: ['scenario1', 'scenario2'],
 			},
-			filterByActive: {
-				place: true,
-				layerTemplateKey: true,
-				applicationKey: true,
-			},
 		};
 
 		dispatch(actions.removeMapLayersByFilter('map4', completeLayerFilter));

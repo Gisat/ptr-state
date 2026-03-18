@@ -60,7 +60,7 @@ describe('state/Data/Components/actions/ensureDataAndRelations', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -177,7 +177,7 @@ describe('state/Data/Components/actions/ensureDataAndRelations', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 

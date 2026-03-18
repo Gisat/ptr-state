@@ -50,7 +50,7 @@ describe('state/Data/Components/actions/loadMissingRelationsAndData', function (
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -128,7 +128,7 @@ describe('state/Data/Components/actions/loadMissingRelationsAndData', function (
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -297,7 +297,7 @@ describe('state/Data/Components/actions/loadMissingRelationsAndData', function (
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -442,7 +442,7 @@ describe('state/Data/Components/actions/loadMissingRelationsAndData', function (
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -655,7 +655,7 @@ describe('state/Data/Components/actions/loadMissingRelationsAndData', function (
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 

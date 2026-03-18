@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import slash from 'slash';
 import commonActions from '../../../../src/state/_common/actions';
-import testBatchRunner from '../../helpers';
+import testBatchRunner, {extendStoreOnPath} from '../../helpers';
 import {commonActionTypesObj as actionTypes} from '../../../constants';
 
 const tests = [
@@ -25,30 +25,40 @@ const tests = [
 				return dispatch(action('k1', 'ak'));
 			};
 		},
-		getState: dataType => () => ({
-			app: {
-				localConfiguration: {
-					apiBackendProtocol: 'http',
-					apiBackendHost: 'localhost',
-					apiBackendPath: '',
+		getState: (dataType, store, storePath) => () => {
+			const baseState = {
+				app: {
+					localConfiguration: {
+						apiBackendProtocol: 'http',
+						apiBackendHost: 'localhost',
+						apiBackendPath: '',
+					},
 				},
-			},
-			[dataType]: {
+			};
+			const storeState = {
 				indexes: [{filter: {applicationKey: 'ak'}}],
-			},
-		}),
+			};
+			return extendStoreOnPath(baseState, storePath, storeState);
+		},
 		setFetch: (dataType, categoryPath) => (url, options) => {
-			assert.strictEqual(`http://localhost/rest/${categoryPath}`, slash(url));
+			assert.strictEqual(
+				`http://localhost/be-metadata/nodes/change`,
+				slash(url)
+			);
 			assert.deepStrictEqual(options, {
-				body: JSON.stringify({
-					data: {[dataType]: [{key: 'k1', data: {applicationKey: 'ak'}}]},
-				}),
+				body: JSON.stringify([
+					{
+						key: 'k1',
+						nodeType: dataType,
+						applicationKey: 'ak',
+					},
+				]),
 				credentials: 'include',
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
 				},
-				method: 'POST',
+				method: 'PATCH',
 			});
 
 			return Promise.resolve({
@@ -91,7 +101,7 @@ const tests = [
 ];
 
 const dataType = 'testStore';
-const categoryPath = 'metadata';
+const categoryPath = 'be-metadata';
 describe(
 	'create',
 	testBatchRunner(dataType, categoryPath, tests, commonActions, actionTypes)

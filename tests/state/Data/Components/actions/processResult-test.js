@@ -35,7 +35,7 @@ describe('state/Data/Components/actions/processResult', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -104,7 +104,7 @@ describe('state/Data/Components/actions/processResult', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -215,7 +215,7 @@ describe('state/Data/Components/actions/processResult', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 
@@ -318,7 +318,7 @@ describe('state/Data/Components/actions/processResult', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 

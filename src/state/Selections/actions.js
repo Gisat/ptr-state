@@ -25,9 +25,9 @@ const setActiveSelectionFeatureKeysFilterKeys = selectionKeys => {
 const setFeatureKeysFilterKeys = (selectionKey, featureKeys) => {
 	return (dispatch, getState) => {
 		const selection = Select.selections.getByKey(getState(), selectionKey);
-		if (selection) {
+		if (selection?.data?.featureKeysFilter) {
 			const distinctItems = selection?.data?.distinctItems;
-			if (distinctItems) {
+			if (distinctItems && selection.data.featureKeysFilter) {
 				const featureKeysFilter =
 					helpers.getUpdatedFeatureKeysFilterForDistinctItems(
 						selection.data.featureKeysFilter,

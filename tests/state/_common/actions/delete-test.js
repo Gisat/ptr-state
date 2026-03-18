@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import slash from 'slash';
 import commonActions from '../../../../src/state/_common/actions';
-import testBatchRunner from '../../helpers';
+import testBatchRunner, {extendStoreOnPath} from '../../helpers';
 import {commonActionTypesObj as actionTypes} from '../../../constants';
 
 const tests = [
@@ -25,15 +25,17 @@ const tests = [
 				return dispatch(action({key: 'k1'}));
 			};
 		},
-		getState: dataType => () => ({
-			app: {
-				localConfiguration: {
-					apiBackendProtocol: 'http',
-					apiBackendHost: 'localhost',
-					apiBackendPath: '',
+		getState: (dataType, store, storePath) => () => {
+			const baseState = {
+				app: {
+					localConfiguration: {
+						apiBackendProtocol: 'http',
+						apiBackendHost: 'localhost',
+						apiBackendPath: '',
+					},
 				},
-			},
-			[dataType]: {
+			};
+			const storeState = {
 				indexes: [
 					{
 						filter: {name: 'fil'},
@@ -43,20 +45,24 @@ const tests = [
 						index: {1: null, 2: 'k1', 3: 'k2', 4: 'k3'},
 					},
 				],
-			},
-		}),
+			};
+			return extendStoreOnPath(baseState, storePath, storeState);
+		},
 		setFetch: (dataType, categoryPath) => (url, options) => {
-			assert.strictEqual(`http://localhost/rest/${categoryPath}`, slash(url));
+			assert.strictEqual(
+				`http://localhost/be-metadata/nodes/remove`,
+				slash(url)
+			);
 			assert.deepStrictEqual(options, {
 				body: JSON.stringify({
-					data: {[dataType]: [{key: 'k1'}]},
+					keys: ['k1'],
 				}),
 				credentials: 'include',
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
 				},
-				method: 'DELETE',
+				method: 'PATCH',
 			});
 
 			return Promise.resolve({
@@ -102,7 +108,7 @@ const tests = [
 ];
 
 const dataType = 'testStore';
-const categoryPath = 'metadata';
+const categoryPath = 'be-metadata';
 describe(
 	'delete',
 	testBatchRunner(dataType, categoryPath, tests, commonActions, actionTypes)

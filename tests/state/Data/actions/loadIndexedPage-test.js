@@ -39,10 +39,7 @@ describe('state/Data/actions/loadIndexedPage', function () {
 		const dispatch = storeHelpers.getDispatch(getState);
 
 		setFetch(function (url, options) {
-			assert.strictEqual(
-				'http://localhost/backend/rest/data/filtered',
-				slash(url)
-			);
+			assert.strictEqual('http://localhost/rest/data/filtered', slash(url));
 
 			return Promise.resolve({
 				ok: true,
@@ -117,10 +114,7 @@ describe('state/Data/actions/loadIndexedPage', function () {
 		const dispatch = storeHelpers.getDispatch(getState);
 
 		setFetch(function (url, options) {
-			assert.strictEqual(
-				'http://localhost/backend/rest/data/filtered',
-				slash(url)
-			);
+			assert.strictEqual('http://localhost/rest/data/filtered', slash(url));
 			assert.deepStrictEqual(options, {
 				body: JSON.stringify({
 					layerTemplateKey: '11c7cc1b-9834-4e85-aba6-eab5571705e4',
@@ -308,10 +302,7 @@ describe('state/Data/actions/loadIndexedPage', function () {
 		});
 
 		setFetch(function (url, options) {
-			assert.strictEqual(
-				'http://localhost/backend/rest/data/filtered',
-				slash(url)
-			);
+			assert.strictEqual('http://localhost/rest/data/filtered', slash(url));
 			assert.deepStrictEqual(options, {
 				body: JSON.stringify({
 					modifiers: {
@@ -762,10 +753,7 @@ describe('state/Data/actions/loadIndexedPage', function () {
 		});
 
 		setFetch(function (url, options) {
-			assert.strictEqual(
-				'http://localhost/backend/rest/data/filtered',
-				slash(url)
-			);
+			assert.strictEqual('http://localhost/rest/data/filtered', slash(url));
 			assert.deepStrictEqual(options, {
 				body: JSON.stringify({
 					layerTemplateKey: '11c7cc1b-9834-4e85-aba6-eab5571705e4',

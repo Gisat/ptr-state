@@ -3,23 +3,29 @@ import ActionTypes from '../../constants/ActionTypes';
 import common from '../_common/actions';
 import Select from '../Select';
 
+export const dataType = 'styles';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 
 const add = common.add(ActionTypes.STYLES);
 const create = common.create(
 	Select.styles.getSubstate,
-	'styles',
-	ActionTypes.STYLES
+	dataType,
+	ActionTypes.STYLES,
+	beCategoryPath
 );
 const deleteItem = common.delete(
 	Select.styles.getSubstate,
-	'styles',
-	ActionTypes.STYLES
+	dataType,
+	ActionTypes.STYLES,
+	beCategoryPath
 );
 const saveEdited = common.saveEdited(
 	Select.styles.getSubstate,
-	'styles',
-	ActionTypes.STYLES
+	dataType,
+	ActionTypes.STYLES,
+	beCategoryPath
 );
 const updateEdited = common.updateEdited(
 	Select.styles.getSubstate,
@@ -27,13 +33,15 @@ const updateEdited = common.updateEdited(
 );
 const useIndexed = common.useIndexed(
 	Select.styles.getSubstate,
-	'styles',
-	ActionTypes.STYLES
+	dataType,
+	ActionTypes.STYLES,
+	beCategoryPath
 );
 const useKeys = common.useKeys(
 	Select.styles.getSubstate,
-	'styles',
-	ActionTypes.STYLES
+	dataType,
+	ActionTypes.STYLES,
+	beCategoryPath
 );
 const useKeysClear = common.useKeysClear(ActionTypes.STYLES);
 const updateStateFromView = common.updateSubstateFromView(ActionTypes.STYLES);
@@ -42,8 +50,9 @@ const useIndexedClear = common.useIndexedClear(ActionTypes.STYLES);
 const clearIndex = common.clearIndex(ActionTypes.STYLES);
 const refreshUses = common.refreshUses(
 	Select.styles.getSubstate,
-	`styles`,
-	ActionTypes.STYLES
+	dataType,
+	ActionTypes.STYLES,
+	beCategoryPath
 );
 
 // ============ export ===========

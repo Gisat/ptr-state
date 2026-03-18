@@ -4,6 +4,9 @@ import Select from '../Select';
 import common from '../_common/actions';
 import _ from 'lodash';
 
+export const dataType = 'views';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 
 const add = common.add(ActionTypes.VIEWS);
@@ -11,47 +14,47 @@ const setActiveKey = common.setActiveKey(ActionTypes.VIEWS);
 const setActiveKeys = common.setActiveKeys(ActionTypes.VIEWS);
 const create = common.create(
 	Select.views.getSubstate,
-	'views',
+	dataType,
 	ActionTypes.VIEWS,
-	'views'
+	beCategoryPath
 );
 const deleteItem = common.delete(
 	Select.views.getSubstate,
-	'views',
+	dataType,
 	ActionTypes.VIEWS,
-	'views'
+	beCategoryPath
 );
 const saveEdited = common.saveEdited(
 	Select.views.getSubstate,
-	'views',
+	dataType,
 	ActionTypes.VIEWS,
-	'views'
+	beCategoryPath
 );
 const updateEdited = common.updateEdited(
 	Select.views.getSubstate,
 	ActionTypes.VIEWS,
-	'views'
+	beCategoryPath
 );
 const useKeys = common.useKeys(
 	Select.views.getSubstate,
-	'views',
+	dataType,
 	ActionTypes.VIEWS,
-	'views'
+	beCategoryPath
 );
 const useKeysClear = common.useKeysClear(ActionTypes.VIEWS);
 const useIndexedClear = common.useIndexedClear(ActionTypes.VIEWS);
 const useIndexed = common.useIndexed(
 	Select.views.getSubstate,
-	'views',
+	dataType,
 	ActionTypes.VIEWS,
-	'views'
+	beCategoryPath
 );
 const clearIndex = common.clearIndex(ActionTypes.VIEWS);
 const refreshUses = common.refreshUses(
 	Select.views.getSubstate,
-	`views`,
+	dataType,
 	ActionTypes.VIEWS,
-	'views'
+	beCategoryPath
 );
 
 const updateStateFromView = common.updateSubstateFromView(ActionTypes.VIEWS);

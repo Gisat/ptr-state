@@ -1,4 +1,5 @@
 import {isEmpty as _isEmpty} from 'lodash';
+import {stateManagement} from '@gisatcz/ptr-utils';
 import {
 	createSelector as createRecomputeSelector,
 	createObserver as createRecomputeObserver,
@@ -17,6 +18,67 @@ const getAllAsObject = common.getAllAsObject(getSubstate);
 const getIndexesObserver = createRecomputeObserver(state =>
 	common.getIndexes(getSubstate)(state)
 );
+
+/**
+ * Merge vector data source with featureId datasource
+ * @param {Array} dataSources
+ * @returns {Array} dataSources
+ */
+const mergeVectorTypes = (dataSources = []) => {
+	return dataSources.reduce((acc, val) => {
+		if (val.data.type === 'vector') {
+			//check if fid ds exists
+			const dsIndex = acc.findIndex(
+				ds => ds.data.vectorKey === val.data.vectorKey
+			);
+
+			if (dsIndex > -1) {
+				//merge
+				const merged = {
+					...acc[dsIndex],
+					...val,
+					data: {
+						...acc[dsIndex].data,
+						...val.data,
+					},
+				};
+				return stateManagement.replaceItemOnIndex(acc, dsIndex, merged);
+			} else {
+				return [...acc, val];
+			}
+		}
+
+		if (val.data.type === 'featureId') {
+			//check if fid ds exists
+			const dsIndex = acc.findIndex(
+				ds => ds.data.vectorKey === val.data.vectorKey
+			);
+
+			if (dsIndex > -1) {
+				//merge
+				const merged = {
+					...acc[dsIndex],
+					data: {
+						...acc[dsIndex].data,
+						fidColumnName: val.data.propertyName,
+					},
+				};
+
+				return stateManagement.replaceItemOnIndex(acc, dsIndex, merged);
+			} else {
+				const blankVectorDSWithFID = {
+					data: {
+						vectorKey: val.data.vectorKey,
+						fidColumnName: val.data.propertyName,
+					},
+				};
+				return [...acc, blankVectorDSWithFID];
+			}
+		}
+
+		return [...acc, val];
+	}, []);
+};
 
 /**
  * It returns data source model for given key, if exists
@@ -72,7 +134,9 @@ const getIndexed_recompute = createRecomputeSelector(filter => {
 	if (index?.index) {
 		let keys = Object.values(index.index);
 		if (keys) {
-			return getByKeys(keys);
+			const byKeys = getByKeys(keys);
+			const merged = mergeVectorTypes(byKeys);
+			return merged;
 		} else {
 			return null;
 		}

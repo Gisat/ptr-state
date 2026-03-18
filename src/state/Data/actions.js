@@ -1342,7 +1342,169 @@ function loadIndexedPage(
 	};
 }
 
+/**
+ * Import geojson to state
+ * Separate geometry and attribute data to their stores.
+ */
+function importGeojson(
+	geoJson,
+	featureIdColumnName,
+	spatialDataSourceKey,
+	commonRelationsFilter,
+	sqlFeatureIdColumnName,
+	attributeColumns
+) {
+	return dispatch => {
+		//PROCCESS SPATIAL DATA
+		const spatialDataByFeatureID = geoJson.features.reduce((acc, feature) => {
+			return {
+				...acc,
+				...{[feature.properties[featureIdColumnName]]: feature.geometry},
+			};
+		}, {});
+
+		const spatialDataBySDSKey = {
+			[spatialDataSourceKey]: {data: spatialDataByFeatureID},
+		};
+
+		const order = null;
+		const changedOn = '';
+		dispatch(
+			spatialData.receiveIndexed(
+				spatialDataBySDSKey,
+				commonRelationsFilter,
+				order,
+				changedOn
+			)
+		);
+
+		//PROCCESS ATTRIBUTE DATA
+		const attibuteDataByFeatureID = geoJson.features.reduce((acc, feature) => {
+			return {
+				...acc,
+				...{[feature.properties[sqlFeatureIdColumnName]]: feature.properties},
+			};
+		}, {});
+
+		const featureIDs = Object.keys(attibuteDataByFeatureID);
+
+		const attibuteDataBySDSKey = {
+			attributeData: {
+				[spatialDataSourceKey]: attibuteDataByFeatureID,
+			},
+			index: [...featureIDs],
+		};
+
+		// const spatialDataBySDSKey = {
+		// 	[spatialDataSourceKey]: {data},
+		// };
+
+		const start = 0;
+		const total = featureIDs.length;
+		const limit = total;
+		dispatch(
+			attributeData.receiveIndexed(
+				attibuteDataBySDSKey,
+				commonRelationsFilter,
+				order,
+				start,
+				total,
+				changedOn,
+				limit
+			)
+		);
+	};
+}
+
+/**
+ * Load data
+ * @param {string?} styleKey
+ * @param {Object?} relations Pagination for relations.
+ * @param {Object?} spatialIndex Object where under "tiles" key is array of tiles that should be loaded. Tiles are subset of tiles defined inspatilaFilter.
+ * @param {Object} spatialFilter Spatial defined filter of level and its tiles
+ * @param {bool} loadGeometry Whether response should contain geometry
+ * @param {bool} loadAttributeRelations Whether response should contain relations
+ * @param {bool} loadSpatialRelations Whether response should contain relations
+ * @param {Array?} order
+ * @param {Object} spatialRelationsFilter Filler object contains modifiers and layerTemplateKey or areaTreeLevelKey.
+ * @param {Object} attributeRelationsFilter Filler object contains modifiers, layerTemplateKey or areaTreeLevelKey and styleKey.
+ * @param {Object} attributeDataFilter Filler object contains modifiers, layerTemplateKey or areaTreeLevelKey, styleKey, and optional values for attributeFilter, dataSourceKeys and featureKeys.
+ */
+function newEnsureData(
+	featureIdColumnName,
+	attributeColumns = [],
+	vectorKey,
+	spatialDataSourceKey,
+	commonRelationsFilter
+) {
+	return (dispatch, getState) => {
+		const promises = [];
+		const order = null;
+		const spatialDataIndex =
+			Select.data.spatialData.getIndex(
+				getState(),
+				commonRelationsFilter,
+				order
+			) || {};
+
+		if (!spatialDataIndex?.index) {
+			const localConfig = Select.app.getCompleteLocalConfiguration(getState());
+			const apiPath = 'be-gisdata/vectors'; //???
+
+			// TODO
+			// set loading
+
+			const payload = {
+				vectorKey,
+				includeGeometry: true,
+				attributes: [
+					...(featureIdColumnName ? [featureIdColumnName] : []),
+					...attributeColumns,
+				],
+			};
+
+			const getDataRequest = request(
+				localConfig,
+				apiPath,
+				'POST',
+				null,
+				payload,
+				undefined,
+				null
+			)
+				.then(result => {
+					if (result.errors) {
+						const error = new Error('no data');
+						dispatch(commonActions.actionGeneralError(error));
+					} else {
+						//IMPORT GEOJSON
+						dispatch(
+							importGeojson(
+								result,
+								featureIdColumnName,
+								spatialDataSourceKey,
+								commonRelationsFilter,
+								attributeColumns
+							)
+						);
+					}
+				})
+				.catch(error => {
+					dispatch(commonActions.actionGeneralError(error));
+					return error; //todo do we need to return this
+				});
+
+			promises.push(getDataRequest);
+		}
+
+		return Promise.all(promises);
+	};
+}
+
 export default {
+	//new
+	newEnsureData,
+
 	//export of sub actions
 	attributeData,
 	attributeDataSources,

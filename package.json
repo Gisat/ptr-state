@@ -1,6 +1,6 @@
 {
 	"name": "@gisatcz/ptr-state",
-	"version": "2.6.0",
+	"version": "3.0.0-dev.0",
 	"description": "Panther FE state package",
 	"sideEffects": false,
 	"keywords": [
@@ -30,7 +30,7 @@
 		"react-dom": "^16.13.1 || ^17.0.2 || ^18.1.0 "
 	},
 	"dependencies": {
-		"@gisatcz/ptr-core": "^1.7.0",
+		"@gisatcz/ptr-core": "^1.8.0",
 		"@gisatcz/ptr-tile-grid": "^0.2.0",
 		"@gisatcz/ptr-utils": "^1.6.0",
 		"@jvitela/recompute": "^0.3.4",
@@ -38,7 +38,7 @@
 		"fast-stringify": "^2.0.0",
 		"isomorphic-fetch": "^3.0.0",
 		"lodash": "^4.17.21",
-		"moment": "^2.29.1",
+		"moment": "^2.29.4",
 		"query-string": "^6.14.0",
 		"re-reselect": "^4.0.0",
 		"react-redux": "^8.0.2",
@@ -48,18 +48,19 @@
 		"reselect": "^4.1.2"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7.16.0",
-		"@babel/core": "^7.16.0",
+		"@babel/cli": "^7.23.0",
+		"@babel/core": "^7.23.2",
 		"@babel/plugin-transform-runtime": "^7.16.0",
 		"@babel/preset-env": "^7.16.0",
 		"@babel/preset-react": "^7.16.0",
-		"@babel/register": "^7.16.0",
+		"@babel/register": "^7.28.6",
 		"@gisatcz/prettier-config": "^0.0.3",
 		"@rollup/plugin-babel": "^5.3.0",
 		"@rollup/plugin-commonjs": "^22.0.0",
 		"babel-loader": "^8.2.3",
 		"babel-plugin-istanbul": "^6.1.1",
 		"babel-plugin-lodash": "^3.3.4",
+		"babel-plugin-transform-import-meta": "^2.3.3",
 		"chai": "^4.3.4",
 		"cross-env": "^7.0.3",
 		"eslint": "^8.17.0",
@@ -69,7 +70,7 @@
 		"flat": "^5.0.2",
 		"glob": "^7.2.0",
 		"husky": "^7.0.4",
-		"mocha": "^10.0.0",
+		"mocha": "^10.2.0",
 		"npm-run-all": "^4.1.5",
 		"nyc": "^15.1.0",
 		"path": "^0.12.7",
@@ -82,6 +83,15 @@
 		"rollup-plugin-filesize": "^9.1.0",
 		"slash": "3.0.0"
 	},
+	"release": {
+		"branches": [
+			"master",
+			{
+				"name": "dev",
+				"prerelease": true
+			}
+		]
+	},
 	"scripts": {
 		"clean": "rimraf dist",
 		"start": "cross-env BABEL_ENV=development run-s clean && run-p start:es start:cjs start:lib:es",
@@ -93,8 +103,8 @@
 		"build:cjs": "cross-env BABEL_ENV=production NODE_ENV=cjs rollup -c",
 		"build:lib:es": "cross-env BABEL_ENV=production npm-run-all build:babel:lib:es",
 		"build:babel:lib:es": "cross-env BABEL_ENV=production babel src -d lib",
-		"test": "cross-env TZ=utc mocha",
-		"test:watch": "cross-env TZ=utc mocha --watch",
+		"test": "cross-env NODE_OPTIONS=\"--no-experimental-require-module\" TZ=utc mocha -r ./preload.cjs",
+		"test:watch": "cross-env NODE_OPTIONS=\"--no-experimental-require-module\" TZ=utc mocha -r ./preload.cjs --watch",
 		"coverage": "cross-env NODE_ENV=test TZ=utc nyc --reporter=html --reporter=json npm run test",
 		"format": "prettier --write .",
 		"lint": "eslint .",

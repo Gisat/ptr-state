@@ -408,7 +408,7 @@ describe('getFinalLayerByDataSourceAndLayerState', function () {
 		const spatialDataSource = {
 			key: 'dataSource2',
 			data: {
-				type: 'cog',
+				type: 'cogBitmap',
 				url: 'https://beautiful.cog',
 			},
 		};
@@ -422,7 +422,7 @@ describe('getFinalLayerByDataSourceAndLayerState', function () {
 			layerKey,
 			opacity: 1,
 			name: 'COG',
-			type: 'cog',
+			type: 'cogBitmap',
 			options: {
 				url: 'https://beautiful.cog',
 				style: {
@@ -459,7 +459,7 @@ describe('getFinalLayerByDataSourceAndLayerState', function () {
 		const spatialDataSource = {
 			key: 'dataSource2',
 			data: {
-				type: 'cog',
+				type: 'cogBitmap',
 				url: 'https://beautiful.cog',
 			},
 		};
@@ -474,7 +474,7 @@ describe('getFinalLayerByDataSourceAndLayerState', function () {
 			layerKey,
 			opacity: 1,
 			name: 'COG',
-			type: 'cog',
+			type: 'cogBitmap',
 			options: {
 				url: 'https://beautiful.cog',
 				style: {

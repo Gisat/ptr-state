@@ -4,32 +4,35 @@ import Select from '../../Select';
 
 const actionTypes = ActionTypes.DATA.SPATIAL_RELATIONS;
 
+export const dataType = 'spatial';
+export const beCategoryPath = 'be-metadata';
+
 const addIndex = common.addIndex(actionTypes);
 const add = common.add(actionTypes);
 const ensureIndexed = (filter, order, start, length) =>
 	common.ensureIndexed(
 		Select.data.spatialRelations.getSubstate,
-		'spatial',
+		dataType,
 		filter,
 		order,
 		start,
 		length,
 		ActionTypes.DATA.SPATIAL_RELATIONS,
-		'relations'
+		beCategoryPath
 	);
 
 const useIndexed = common.useIndexed(
 	Select.data.spatialRelations.getSubstate,
-	'spatial',
+	dataType,
 	ActionTypes.DATA.SPATIAL_RELATIONS,
-	'relations'
+	beCategoryPath
 );
 
 const refreshUses = common.refreshUses(
 	Select.data.spatialRelations.getSubstate,
-	'spatial',
+	dataType,
 	ActionTypes.DATA.SPATIAL_RELATIONS,
-	'relations'
+	beCategoryPath
 );
 
 // ============ creators ===========

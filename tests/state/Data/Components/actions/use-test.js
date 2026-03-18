@@ -90,7 +90,7 @@ describe('state/Data/Components/actions/use', function () {
 
 		setFetch(function (url, options) {
 			assert.strictEqual(
-				'http://localhost/backend/rest/attributeData/filtered',
+				'http://localhost/rest/attributeData/filtered',
 				slash(url)
 			);
 			if (

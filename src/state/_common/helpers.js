@@ -391,6 +391,10 @@ function convertModifiersToRequestFriendlyFormat(modifiers) {
 			modifiersForRequest.periodKey = modifiers.periodKey;
 		}
 
+		if (modifiers.areaTreeLevelKey) {
+			modifiersForRequest.areaTreeLevelKey = modifiers.areaTreeLevelKey;
+		}
+
 		if (modifiers.applicationKey || modifiers.applicationKey === null) {
 			modifiersForRequest.applicationKey = modifiers.applicationKey;
 		}

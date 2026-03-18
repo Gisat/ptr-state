@@ -2,23 +2,28 @@ import ActionTypes from '../../constants/ActionTypes';
 import common from '../_common/actions';
 import Select from '../Select';
 
+export const dataType = 'layerTemplate';
+export const beCategoryPath = 'be-metadata';
 // ============ creators ===========
 
 const add = common.add(ActionTypes.LAYER_TEMPLATES);
 const create = common.create(
 	Select.layerTemplates.getSubstate,
-	'layerTemplates',
-	ActionTypes.LAYER_TEMPLATES
+	dataType,
+	ActionTypes.LAYER_TEMPLATES,
+	beCategoryPath
 );
 const deleteItem = common.delete(
 	Select.layerTemplates.getSubstate,
-	'layerTemplates',
-	ActionTypes.LAYER_TEMPLATES
+	dataType,
+	ActionTypes.LAYER_TEMPLATES,
+	beCategoryPath
 );
 const saveEdited = common.saveEdited(
 	Select.layerTemplates.getSubstate,
-	'layerTemplates',
-	ActionTypes.LAYER_TEMPLATES
+	dataType,
+	ActionTypes.LAYER_TEMPLATES,
+	beCategoryPath
 );
 const setActiveKey = common.setActiveKey(ActionTypes.LAYER_TEMPLATES);
 const updateEdited = common.updateEdited(
@@ -31,19 +36,22 @@ const updateStateFromView = common.updateSubstateFromView(
 const setActiveKeys = common.setActiveKeys(ActionTypes.LAYER_TEMPLATES);
 const useKeys = common.useKeys(
 	Select.layerTemplates.getSubstate,
-	'layerTemplates',
-	ActionTypes.LAYER_TEMPLATES
+	dataType,
+	ActionTypes.LAYER_TEMPLATES,
+	beCategoryPath
 );
 const useKeysClear = common.useKeysClear(ActionTypes.LAYER_TEMPLATES);
 const useIndexed = common.useIndexed(
 	Select.layerTemplates.getSubstate,
-	'layerTemplates',
-	ActionTypes.LAYER_TEMPLATES
+	dataType,
+	ActionTypes.LAYER_TEMPLATES,
+	beCategoryPath
 );
 const refreshUses = common.refreshUses(
 	Select.layerTemplates.getSubstate,
-	`layerTemplates`,
-	ActionTypes.LAYER_TEMPLATES
+	dataType,
+	ActionTypes.LAYER_TEMPLATES,
+	beCategoryPath
 );
 const useIndexedClear = common.useIndexedClear(ActionTypes.LAYER_TEMPLATES);
 const clearIndex = common.clearIndex(ActionTypes.LAYER_TEMPLATES);
@@ -52,7 +60,7 @@ const setActiveKeyAndEnsureDependencies = key => {
 	return (dispatch, getState, options) => {
 		dispatch(setActiveKey(key));
 		if (options) {
-			dispatch(options.ensureDependenciesOfActiveMetadataType('layerTemplate'));
+			dispatch(options.ensureDependenciesOfActiveMetadataType(dataType));
 		}
 	};
 };
@@ -61,7 +69,7 @@ const setActiveKeysAndEnsureDependencies = keys => {
 	return (dispatch, getState, options) => {
 		dispatch(setActiveKeys(keys));
 		if (options) {
-			dispatch(options.ensureDependenciesOfActiveMetadataType('layerTemplate'));
+			dispatch(options.ensureDependenciesOfActiveMetadataType(dataType));
 		}
 	};
 };

@@ -1,5 +1,6 @@
 import Select from '../../../../src/state/Select';
 import {assert} from 'chai';
+import {setState} from '@jvitela/recompute';
 import testHelpers from '../../../helpers';
 import {MapsSelectorsState as state} from './_state';
 
@@ -10,7 +11,6 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 			layerTemplateKey: 'layerTemplate2',
 			metadataModifiers: {
 				periodKey: 'period1',
-				scopeKey: 'scope1',
 			},
 		},
 		{
@@ -20,7 +20,7 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 			styleKey: 'style1',
 			metadataModifiers: {
 				placeKey: 'place1',
-				scopeKey: 'scope1',
+
 				scenarioKeys: ['scenario1', 'scenario2'],
 			},
 		},
@@ -38,9 +38,7 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 					],
 				},
 			},
-			metadataModifiers: {
-				scopeKey: 'scope1',
-			},
+			metadataModifiers: {},
 		},
 	];
 
@@ -50,7 +48,6 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 			layerTemplateKey: 'layerTemplate2',
 			metadataModifiers: {
 				periodKey: 'period1',
-				scopeKey: 'scope1',
 			},
 		},
 		{
@@ -60,27 +57,28 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 			styleKey: 'style3',
 			metadataModifiers: {
 				placeKey: 'place2',
-				periodKey: 'period2',
-				scopeKey: 'scope1',
 			},
 		},
 	];
 
 	it('should return map layers for map 1', () => {
+		setState(state);
 		const output = Select.maps.getLayersStateWithMergedFiltersByMapKey(
 			state,
 			'map1'
 		);
-		debugger;
 		assert.deepStrictEqual(output, expectedResult);
+		setState(null);
 	});
 
 	it('should return map layers for map 2', () => {
+		setState(state);
 		const output = Select.maps.getLayersStateWithMergedFiltersByMapKey(
 			state,
 			'map2'
 		);
 		assert.deepStrictEqual(output, expectedResult2);
+		setState(null);
 	});
 
 	testHelpers.testCache(
@@ -91,6 +89,7 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 	);
 
 	it('should return just map layers, if set layers do not exist', () => {
+		setState(state);
 		const updatedState = {
 			...state,
 			maps: {
@@ -112,9 +111,11 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 			'map2'
 		);
 		assert.deepStrictEqual(output, [expectedResult2[1]]);
+		setState(null);
 	});
 
 	it('should return just set layers, if map layers do not exist', () => {
+		setState(state);
 		const updatedState = {
 			...state,
 			maps: {
@@ -136,9 +137,11 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 			'map2'
 		);
 		assert.deepStrictEqual(output, [expectedResult2[0]]);
+		setState(null);
 	});
 
 	it('should return null, if both set layers and map layers is null', () => {
+		setState(state);
 		const updatedState = {
 			...state,
 			maps: {
@@ -170,5 +173,6 @@ describe('getLayersStateWithMergedFiltersByMapKey', function () {
 			'map2'
 		);
 		assert.isNull(output);
+		setState(null);
 	});
 });

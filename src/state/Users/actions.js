@@ -14,26 +14,31 @@ import CasesAction from '../Cases/actions';
 
 const TTL = 5;
 
+export const userDataType = 'users';
+export const groupDataType = 'groups';
+export const dataType = 'users';
+export const beCategoryPath = 'be-metadata';
+
 // ============ creators ===========
 
 const add = common.add(ActionTypes.USERS);
 const create = common.create(
 	Select.users.getSubstate,
-	'users',
+	userDataType,
 	ActionTypes.USERS,
-	'user'
+	beCategoryPath
 );
 const deleteItem = common.delete(
 	Select.users.getSubstate,
-	'users',
+	userDataType,
 	ActionTypes.USERS,
-	'user'
+	beCategoryPath
 );
 const saveEdited = common.saveEdited(
 	Select.users.getSubstate,
-	'users',
+	userDataType,
 	ActionTypes.USERS,
-	'user'
+	beCategoryPath
 );
 const updateEdited = common.updateEdited(
 	Select.users.getSubstate,
@@ -44,38 +49,38 @@ const refreshUses = () => dispatch => {
 	dispatch(
 		common.refreshUses(
 			Select.users.getSubstate,
-			'users',
+			userDataType,
 			ActionTypes.USERS,
-			'user'
+			beCategoryPath
 		)()
 	);
 	dispatch(
 		common.refreshUses(
 			Select.users.getGroupsSubstate,
-			'groups',
+			groupDataType,
 			ActionTypes.USERS.GROUPS,
-			'user'
+			beCategoryPath
 		)()
 	);
 };
 const useKeys = common.useKeys(
 	Select.users.getSubstate,
-	'users',
+	userDataType,
 	ActionTypes.USERS,
-	'user'
+	beCategoryPath
 );
 const useKeysClear = common.useKeysClear(ActionTypes.USERS);
 const useIndexedUsers = common.useIndexed(
 	Select.users.getSubstate,
-	'users',
+	userDataType,
 	ActionTypes.USERS,
-	'user'
+	beCategoryPath
 );
 const useIndexedGroups = common.useIndexed(
 	Select.users.getGroupsSubstate,
-	'groups',
+	groupDataType,
 	ActionTypes.USERS.GROUPS,
-	'user'
+	beCategoryPath
 );
 
 function onLogin() {

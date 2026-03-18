@@ -92,10 +92,7 @@ describe('state/Data/actions/loadMissingRelationsAndData', function () {
 		});
 
 		setFetch(function (url, options) {
-			assert.strictEqual(
-				'http://localhost/backend/rest/data/filtered',
-				slash(url)
-			);
+			assert.strictEqual('http://localhost/rest/data/filtered', slash(url));
 			assert.deepStrictEqual(options, {
 				body: JSON.stringify({
 					modifiers: {
@@ -422,10 +419,7 @@ describe('state/Data/actions/loadMissingRelationsAndData', function () {
 		});
 
 		setFetch(function (url, options) {
-			assert.strictEqual(
-				'http://localhost/backend/rest/data/filtered',
-				slash(url)
-			);
+			assert.strictEqual('http://localhost/rest/data/filtered', slash(url));
 			//check for first request
 			if (
 				_.isEqual(options, {
