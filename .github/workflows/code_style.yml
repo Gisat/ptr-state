@@ -10,8 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # Ensure that git uses your token with write access to the repo
-          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare repository
         run: git fetch --unshallow --tags
